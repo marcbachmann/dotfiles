@@ -1,0 +1,26 @@
+## JavaScript
+## 
+syntax "JS" "\.js$" "\.sjs$"
+
+# Reserved Keywords
+color yellow "\b(instanceof|typeof|break|do|new|var|case|else|return|void|catch|finally|continue|for|switch|while|this|with|debugger|function|throw|default|if|try|delete|in)\b"
+
+# Future Reserved Words
+color brightblue "\b(class|enum|extends|super|import|const|export|implements|let|private|public|yield|static|interface|package|protected)\b"
+
+# Punctuators
+color brightyellow "(\{|\}|\(|\)|\[|\]|\.|\;|\,|<|>|<=|===|\!==|>=|==|\!=|\+|\-|\*|\%|\+\+|\-\-|<<|>>|>>>|\&|\||\^|\!|\~|\&\&|\|\||\?|\:|=|\+=|\-=|\*=|\%=|<\=|>>=|>>>=|\&=|\|=|\^=|\/|\/=)"
+
+# Literals
+color yellow "\b(null|true|false|undefined)\b"
+
+# Strings
+color cyan "\"([^"]*|\\\")*\""
+color cyan "'([^']*|\\')*'"
+
+# Comments
+color green "\s*//.*"
+color brightgreen start="/\*" end="\*/"
+
+# Mark non breaking space
+color yellow,red "Â "

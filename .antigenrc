@@ -1,0 +1,5 @@
+antigen use oh-my-zsh
+antigen bundle lukechilds/zsh-nvm
+antigen bundle lukechilds/zsh-better-npm-completion
+antigen theme agnoster
+antigen apply

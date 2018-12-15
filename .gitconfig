@@ -1,0 +1,71 @@
+[color]
+  ui = true
+
+[user]
+	name = Marc Bachmann
+  user = marcbachmann
+	email = marc.brookman@gmail.com
+  signingkey = 001884E1441067E1
+
+[core]
+  editor = /usr/local/bin/nano
+  excludesfile = /Users/marcbachmann/.gitignore_global
+
+[commit]
+  gpgsign = true
+  template = /Users/marcbachmann/.stCommitMsg
+
+[push]
+  default = upstream
+
+[alias]
+  authors = log --format='%aN <%aE>'
+  lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
+  last = log -n1 --decorate=short --abbrev-commit --format=fuller
+  s = status -sb
+  d = diff
+  wd = diff --word-diff
+  co = checkout
+  chekcout = checkout
+  b = branch -v
+  branch-history = "for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'"
+  ls = !ls
+  ri = rebase --interactive --autosquash
+  fixup = commit --fixup
+  append = "!f() { (git diff-files --quiet || (echo Unstaged changes, please commit or stash with --keep-index; exit 1)) && COMMIT=$(git rev-parse $1) && git commit --fixup=$COMMIT && GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash $COMMIT~1; }; f"
+  fetch-pr = "!f() { git fetch origin refs/pull/$1/head:pr/$1; } ; f"
+  checkout-pr = "!f() { git fetch origin refs/pull/$1/head:pr/$1; } ; f"
+  diff-list = diff --name-only
+  repo = !hub browse
+  default = "!f() { git checkout $(sed -n 's/^.*worktrees\\///p' < ./$(git rev-parse --show-prefix).git); }; f"
+
+[credential]
+  helper = osxkeychain
+
+[filter "lfs"]
+  clean = git-lfs clean %f
+  smudge = git-lfs smudge %f
+  required = true
+
+[gist]
+  username = marcbachmann
+  token = fcf40c57c2f64361a00349adba77bb89dc48fbcd
+
+[rerere]
+  enabled = true
+
+[merge]
+  stat = true
+
+[rebase]
+  autosquash = true
+
+[gpg]
+  program = gpg
+
+[difftool "sourcetree"]
+  cmd = opendiff \"$LOCAL\" \"$REMOTE\"
+  path = 
+[mergetool "sourcetree"]
+  cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
+  trustExitCode = true
