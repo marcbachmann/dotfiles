@@ -1,4 +1,3 @@
-tap "fangli/dev"
 tap "getantibody/tap"
 tap "homebrew/bundle"
 tap "homebrew/cask"
@@ -12,7 +11,7 @@ brew "openssl"
 brew "ansible"
 brew "antigen"
 brew "autoconf"
-brew "awscli", link: false
+brew "awscli"
 brew "bat"
 brew "bison"
 brew "gettext"
@@ -22,7 +21,6 @@ brew "carthage"
 brew "cmake"
 brew "pth"
 brew "dirmngr"
-brew "docker", link: false
 brew "emacs"
 brew "ffmpeg"
 brew "gdk-pixbuf"
@@ -44,7 +42,6 @@ brew "libatomic_ops"
 brew "libcroco"
 brew "libexif"
 brew "libusb-compat"
-brew "libuv"
 brew "macvim"
 brew "makedepend"
 brew "mas"
@@ -52,9 +49,7 @@ brew "moreutils"
 brew "mtr"
 brew "nano"
 brew "neovim"
-brew "nghttp2", link: false
 brew "nmap"
-brew "pass"
 brew "pinentry-mac"
 brew "py2cairo"
 brew "py3cairo"
@@ -70,7 +65,6 @@ brew "trash"
 brew "watch"
 brew "wget"
 brew "wrk"
-brew "fangli/dev/rancherssh"
 brew "getantibody/tap/antibody"
 brew "talal/tap/bonclay"
 cask "1password-cli"
@@ -78,6 +72,7 @@ cask "balenaetcher"
 cask "betterzipql"
 cask "calibre"
 cask "citrix-workspace"
+cask "docker"
 cask "dropbox"
 cask "evernote"
 cask "font-fira-code"
@@ -102,14 +97,11 @@ cask "vlc"
 cask "webpquicklook"
 cask "zoomus"
 mas "1Password 7", id: 1333542190
-mas "ColorSlurp", id: 1287239339
 mas "Deckset", id: 847496013
 mas "Evernote", id: 406056744
-mas "iBooks Author", id: 490152466
 mas "iMovie", id: 408981434
 mas "Install macOS Mojave", id: 0
 mas "Keynote", id: 409183694
-mas "Microsoft Remote Desktop", id: 1295203466
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
 mas "WhatsApp", id: 1147396723

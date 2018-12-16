@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -eu
 
-# Set default configs
+echo "Set default OSX configs"
 ./defaults.sh
 
 brew -v > /dev/null && echo 'Homebrew is already present' || echo "Install homebrew" && ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
@@ -12,4 +12,5 @@ chsh -s /bin/zsh
 echo "Install apps listed in Brewfile"
 brew bundle
 
+echo "Copy all dotfiles into $HOME"
 bonclay sync bonclay.conf.yaml
