@@ -5,6 +5,7 @@ tap "homebrew/cask"
 tap "homebrew/cask-fonts"
 tap "homebrew/cask-versions"
 tap "homebrew/core"
+tap "talal/tap"
 brew "ack"
 brew "libyaml"
 brew "openssl"
@@ -71,6 +72,7 @@ brew "wget"
 brew "wrk"
 brew "fangli/dev/rancherssh"
 brew "getantibody/tap/antibody"
+brew "talal/tap/bonclay"
 cask "1password-cli"
 cask "balenaetcher"
 cask "betterzipql"
@@ -105,6 +107,7 @@ mas "Deckset", id: 847496013
 mas "Evernote", id: 406056744
 mas "iBooks Author", id: 490152466
 mas "iMovie", id: 408981434
+mas "Install macOS Mojave", id: 0
 mas "Keynote", id: 409183694
 mas "Microsoft Remote Desktop", id: 1295203466
 mas "Numbers", id: 409203825

@@ -12,4 +12,4 @@ chsh -s /bin/zsh
 echo "Install apps listed in Brewfile"
 brew bundle
 
-./link.sh
+bonclay sync bonclay.conf.yaml

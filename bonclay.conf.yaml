@@ -1,0 +1,22 @@
+backup:
+  overwrite: true
+
+restore:
+  overwrite: false
+
+sync:
+  clean: true
+  overwrite: true
+
+spec:
+  ~/.zshrc: .zshrc
+  ~/.zshenv: .zshenv
+  ~/.gitignore_global: .gitignore_global
+  ~/.gnupg/gpg-agent.conf: .gnupg/gpg-agent.conf
+  ~/.antigenrc: .antigenrc
+  ~/.tmux.conf: .tmux.conf
+  ~/.nanorc: .nanorc
+  ~/.nano: .nano
+  ~/.ssh/config: .ssh/config
+  ~/.hammerspoon: .hammerspoon
+  ~/Library/Application Support/Sublime Text 3/Packages/User/: .sublime
