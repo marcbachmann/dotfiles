@@ -1,0 +1,4 @@
+{
+    "semicolon_free": true,
+    "omit_extensions": ["js", "coffee"]
+}

@@ -12,3 +12,5 @@ ln -s $HOME/.dotfiles/.gitignore_global $HOME/.gitignore_global
 ln -s $HOME/.dotfiles/.gitconfig $HOME/.gitconfig
 
 ln -s $HOME/.dotfiles/gpg-agent.conf $HOME/.gnupg/gpg-agent.conf
+
+ln -s $HOME/.dotfiles/.sublime $HOME/Library/Application\ Support/Sublime\ Text\ 3/Packages/User/

@@ -1,0 +1,60 @@
+{
+	"bootstrapped": true,
+	"in_process_packages":
+	[
+	],
+	"installed_packages":
+	[
+		"ApplySyntax",
+		"Better CoffeeScript",
+		"Boxy Theme",
+		"Coffee2Js",
+		"Colorsublime",
+		"DocBlockr",
+		"Dockerfile Syntax Highlighting",
+		"EditorConfig",
+		"Emoji",
+		"Gist",
+		"Git",
+		"Git blame",
+		"GitGutter",
+		"GitHubinator",
+		"HTML-CSS-JS Prettify",
+		"Increment Selection",
+		"JavaScript Snippets",
+		"JavaScriptNext - ES6 Syntax",
+		"MarkdownEditing",
+		"MarkdownPreview",
+		"Monokai - Spacegray",
+		"NodeRequirer",
+		"Open Finder",
+		"Package Control",
+		"PostCSS Sorting",
+		"Pretty JSON",
+		"Protocol Buffer Syntax",
+		"Sass",
+		"SideBarEnhancements",
+		"Siteleaf Liquid Syntax",
+		"sublime-nunjucks",
+		"SublimeLinter",
+		"SublimeLinter-coffeelint",
+		"SublimeLinter-contrib-standard",
+		"SublimeLinter-eslint",
+		"SublimeLinter-json",
+		"SyncedSideBar",
+		"Terminal",
+		"Terraform",
+		"Theme - Soda SolarizedDark",
+		"Theme - Solarized Space",
+		"Theme - Spacegray",
+		"TrailingSpaces",
+		"Varnish VCL",
+		"WakaTime",
+		"Whitespace"
+	],
+	"repositories":
+	[
+		"https://github.com/DJviolin/sublime-nunjucks",
+		"https://github.com/jonlabelle/SublimeJsPrettier"
+	]
+}

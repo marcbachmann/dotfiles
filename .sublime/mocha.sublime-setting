@@ -1,0 +1,3 @@
+{
+  "shell_cmd": "ENVIRONMENT=test npme mocha -r coffee-script/register -r ./test/support/globals.js app/features/menu/test.js"
+}
