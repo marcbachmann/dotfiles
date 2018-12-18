@@ -16,3 +16,13 @@ fra-a13.ipvanish.com
 zur-c16.ipvanish.com
 nyc.ipvanish.com
 ```
+
+iTerm Configs:
+```
+Configured separately in iTerm:
+- Whole setup, shortcuts
+- Three finger down swipe -> horizontal split in iTerm
+- Three finger up swipe -> horizontal split in iTerm
+- Three finger left swipe -> vertical split in iTerm
+- Three finger right swipe -> vertical split in iTerm
+```

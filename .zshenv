@@ -30,12 +30,10 @@ export LANG=en_US.UTF-8
 # General aliases
 alias top=htop
 
-export HYPER_LIGHT_THEME='solarized-light'
 export SUBLIME_LIGHT_COLOR_SCHEME='"Packages/Boxy Theme/schemes/Boxy Yesterday.tmTheme"'
 export SUBLIME_LIGHT_THEME='"Boxy Yesterday.sublime-theme"'
 export VSCODE_LIGHT_COLOR_THEME='Visual Studio Light'
 
-export HYPER_DARK_THEME='material'
 export SUBLIME_DARK_COLOR_SCHEME='"Packages/Boxy Theme/schemes/Boxy Ocean.tmTheme"'
 export SUBLIME_DARK_THEME='"Boxy Ocean.sublime-theme"'
 export VSCODE_DARK_COLOR_THEME='Monokai'
@@ -44,19 +42,16 @@ darkmode () {
   echo "setDarkMode($1)" | hs
 
   if [ "$1" = "true" ]; then
-    local hyper_theme=$HYPER_DARK_THEME
     local sublime_color_scheme=$SUBLIME_DARK_COLOR_SCHEME
     local sublime_theme=$SUBLIME_DARK_THEME
     local vscode_theme=$VSCODE_DARK_COLOR_THEME
   else
-    local hyper_theme=$HYPER_LIGHT_THEME
     local sublime_color_scheme=$SUBLIME_LIGHT_COLOR_SCHEME
     local sublime_theme=$SUBLIME_LIGHT_THEME
     local vscode_theme=$VSCODE_LIGHT_COLOR_THEME
   fi
 
   # Sublime
-  sed -i '' "s|user:.*|user: $(jq -rc . < ~/.hyper_themes/$hyper_theme.json)|g" $HOME/.hyper.js;
   perl -i.bak -pe "s|\"color_scheme\".*|\"color_scheme\": $sublime_color_scheme,|g" "$HOME/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings"
   perl -i.bak -pe "s|\"theme\":.*|\"theme\": $sublime_theme,|g" "$HOME/Library/Application Support/Sublime Text 3/Packages/User/Preferences.sublime-settings"
 

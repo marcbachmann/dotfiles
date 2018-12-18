@@ -536,9 +536,6 @@ local function config()
 
 
 
-
-
-
   -- -- Modal example
   -- -- ------
   local currentScreen = nil
@@ -752,12 +749,6 @@ local function config()
   end)
 
   keyPressWatcher:start()
-
-  -- Missing
-  -- - Three finger down swipe -> horizontal split in iTerm
-  -- - Three finger up swipe -> horizontal split in iTerm
-  -- - Three finger left swipe -> vertical split in iTerm
-  -- - Three finger right swipe -> vertical split in iTerm
 end
 
 config()
