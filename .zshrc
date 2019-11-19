@@ -1,4 +1,6 @@
-export PATH=$PATH:/usr/local/bin:$HOME/bin
+# export DISABLE_MAGIC_FUNCTIONS=true
+fpath=("$HOME/.dotfiles/.zsh/completions" $fpath)
+PATH=$PATH:/usr/local/bin:$HOME/bin
 export DEFAULT_USER="marcbachmann"
 setopt histignorespace
 
@@ -7,7 +9,11 @@ ulimit -n 10000
 # ulimit -u 2096
 
 # iTerm configuration
-test -e ${HOME}/.iterm2_shell_integration.zsh && source ${HOME}/.iterm2_shell_integration.zsh
+test -e $HOME/.iterm2_shell_integration.zsh && source $HOME/.iterm2_shell_integration.zsh
+
+# export NVM_DIR=$HOME/.nvm
+# export NVM_SYMLINK_CURRENT=true
+# export PATH=$PATH:$NVM_DIR/current/bin
 
 if [ $TERM_PROGRAM = "iTerm.app" ] || [ $TERM_PROGRAM = "Hyper" ]; then
   CASE_SENSITIVE="true"
@@ -18,21 +24,41 @@ if [ $TERM_PROGRAM = "iTerm.app" ] || [ $TERM_PROGRAM = "Hyper" ]; then
   antigen init ~/.antigenrc
 fi
 
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#  export EDITOR='nano'
-# else
-#  export EDITOR='subl'
-# fi
+# Node
+alias npme='PATH=$(npm bin):$PATH'
+alias npmo='npm install --offline'
+alias npmclean="rm -Rf ./node_modules && npm install"
+alias n='npm run'
+alias h2url='execute-global h2url'
+alias nvm=fnm
 
-# if [ -f ~/.gnupg/.gpg-agent-info ] && [ -n "$(pgrep gpg-agent)" ]; then
-#    source ~/.gnupg/.gpg-agent-info
-#    export GPG_AGENT_INFO
-#else
-#    eval $(gpg-agent --daemon --write-env-file ~/.gnupg/.gpg-agent-info)
-#fi
+nvm_switch_if_needed () {
+  local NVM_RC_FILE=$(nvm_find_nvmrc)
+  if [ $NVM_RC_FILE ]; then
+    local DESIRED_VERSION=`nvm_version $(cat $NVM_RC_FILE)`
+    local DESIRED_BIN=`nvm_version_path $DESIRED_VERSION`/bin
+    [ "$DESIRED_BIN" = "$NVM_BIN" ] || nvm use $DESIRED_VERSION
+  fi
+}
 
-# This gets loaded twice in the terminal
-# source ~/.zshenv
+# cd () { builtin cd "$@"; nvm_switch_if_needed; }
 
-# bindkey "^X\x7f" backward-kill-line
+meteo () { curl -4 "http://wttr.in/$(echo ${@:-zurich} | tr ' ' _)" }
+
+autoload -U +X bashcompinit && bashcompinit
+complete -o nospace -C /usr/local/bin/terraform terraform
+
+
+# fnm
+eval "$(fnm env --multi)"
+
+autoload -U add-zsh-hook
+_fnm_autoload_hook () {
+  if [[ -f .node-version && -r .node-version ]]; then
+    fnm use --quiet
+  elif [[ -f .nvmrc && -r .nvmrc ]]; then
+    fnm use --quiet
+  fi
+}
+
+add-zsh-hook chpwd _fnm_autoload_hook && _fnm_autoload_hook

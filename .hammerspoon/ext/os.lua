@@ -40,5 +40,8 @@ module.setDarkMode = function(_appearance)
   return res
 end
 
+module.flashScreen = function()
+  hs.applescript.applescript('beep')
+end
 
 return module

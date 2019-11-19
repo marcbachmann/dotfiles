@@ -14,3 +14,5 @@ brew bundle
 
 echo "Copy all dotfiles into $HOME"
 bonclay sync bonclay.conf.yaml
+
+sudo launchctl load -w $PWD/coredns/service.plist

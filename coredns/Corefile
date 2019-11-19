@@ -1,0 +1,22 @@
+. {
+  reload
+  nsid mbp2015.marcbachmann.local
+
+  hosts {
+    fallthrough
+  }
+
+  loadbalance round_robin
+  forward . 8.8.8.8:53 8.8.4.4:53
+
+  cache {
+    success 5000 60 5
+    denial 2500 60 5
+    prefetch 1
+  }
+
+  errors
+
+  health 0.0.0.0:8053
+  prometheus 0.0.0.0:9153
+}

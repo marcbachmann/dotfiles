@@ -1,5 +1,6 @@
 HISTSIZE=1000000
 SAVEHIST=100000
+
 setopt SHARE_HISTORY
 setopt HIST_IGNORE_DUPS
 setopt EXTENDED_HISTORY
@@ -14,12 +15,12 @@ export LANG=en_US.UTF-8
 # export LESS="-F"
 
 # Rust
-# PATH=$PATH:$HOME/.cargo/bin
+PATH=$PATH:$HOME/.cargo/bin
 
 # Go
-# export GOPATH=$HOME/Development
-# export GOBIN=$GOPATH/bin
-# PATH=$PATH:$GOPATH/bin
+export GOPATH=$HOME/Development
+export GOBIN=$GOPATH/bin
+PATH=$PATH:$GOPATH/bin
 
 # v8
 # PATH=$PATH:/Users/marcbachmann/Development/marcbachmann/depot_tools
@@ -29,23 +30,28 @@ export LANG=en_US.UTF-8
 
 # General aliases
 alias top=htop
+alias psql=/usr/local/opt/libpq/bin/psql
+export PGHOST=localhost
+export PGUSER=postgres
 
 export SUBLIME_LIGHT_COLOR_SCHEME='"Packages/Boxy Theme/schemes/Boxy Yesterday.tmTheme"'
 export SUBLIME_LIGHT_THEME='"Boxy Yesterday.sublime-theme"'
 export VSCODE_LIGHT_COLOR_THEME='Visual Studio Light'
 
-export SUBLIME_DARK_COLOR_SCHEME='"Packages/Boxy Theme/schemes/Boxy Ocean.tmTheme"'
-export SUBLIME_DARK_THEME='"Boxy Ocean.sublime-theme"'
+export SUBLIME_DARK_COLOR_SCHEME='"Packages/ayu/ayu-mirage.tmTheme"'
+export SUBLIME_DARK_THEME='"ayu-mirage.sublime-theme"'
+# export SUBLIME_DARK_COLOR_SCHEME='"Packages/Boxy Theme/schemes/Boxy Ocean.tmTheme"'
+# export SUBLIME_DARK_THEME='"Boxy Ocean.sublime-theme"'
 export VSCODE_DARK_COLOR_THEME='Monokai'
 
 darkmode () {
-  echo "setDarkMode($1)" | hs
-
   if [ "$1" = "true" ]; then
+    echo -ne "\033]50;SetProfile=Dark\a"
     local sublime_color_scheme=$SUBLIME_DARK_COLOR_SCHEME
     local sublime_theme=$SUBLIME_DARK_THEME
     local vscode_theme=$VSCODE_DARK_COLOR_THEME
   else
+    echo -ne "\033]50;SetProfile=Light\a"
     local sublime_color_scheme=$SUBLIME_LIGHT_COLOR_SCHEME
     local sublime_theme=$SUBLIME_LIGHT_THEME
     local vscode_theme=$VSCODE_LIGHT_COLOR_THEME
@@ -57,6 +63,8 @@ darkmode () {
 
   # VS Code
   perl -i.bak -pe "s|\"workbench\.colorTheme\":.*|\"workbench\.colorTheme\": \"$vscode_theme\",|g" "$HOME/Library/Application Support/Code/User/settings.json"
+
+  echo "setDarkMode($1)" | /usr/local/bin/hs
 }
 
 alias dark='darkmode true'
@@ -65,26 +73,14 @@ alias light='darkmode false'
 alias help="tldr"
 
 # Node
-export NVM_DIR=$HOME/.nvm
+NVM_DIR=$HOME/.nvm
+# PATH=$PATH:$NVM_DIR/current/bin
 # [ -s "$NVM_DIR/nvm.sh" ] && . $NVM_DIR/nvm.sh  # This loads nvm
-export NVM_SYMLINK_CURRENT=true
-PATH=$PATH:$NVM_DIR/current/bin
-alias npme='PATH=$PATH:$(npm bin)'
+alias npme='PATH=$(npm bin):$PATH'
 alias npmo='npm install --offline'
 alias npmclean="rm -Rf ./node_modules && npm install"
 alias n='npm run'
-
-nvm_switch_if_needed () {
-  local NVM_RC_FILE=$(nvm_find_nvmrc)
-  if [ $NVM_RC_FILE ]; then
-    local DESIRED_VERSION=$(nvm_version $(cat $NVM_RC_FILE))
-    [ "$(nvm_version_path $DESIRED_VERSION)/bin" == "$NVM_BIN" ] || nvm use $DESIRED_VERSION
-  fi
-}
-
-cd () { builtin cd "$@"; nvm_switch_if_needed; }
-
-meteo () { curl -4 "http://wttr.in/$(echo ${@:-zurich} | tr ' ' _)" }
+alias h2url='execute-global h2url'
 
 # Docker
 #export DOCKER_IP=$(ipconfig getifaddr en0)
@@ -100,6 +96,7 @@ alias dcd='docker-compose down'
 
 # Dev
 export EDITOR='nano'
+alias fork='/Applications/Fork.app/Contents/Resources/fork_cli status'
 alias gcb='git checkout -b'
 alias gp='git pull'
 alias gpu='git push -u origin $(git rev-parse --abbrev-ref HEAD)'
@@ -119,13 +116,9 @@ grh () { git reset --hard "HEAD~$1"; }
 # commit & pull-request require gitbub-remote-commit: https://www.npmjs.com/package/github-remote-commit
 alias commit='commit -t $(/usr/bin/security find-generic-password -s github-token -a $USER -w)'
 alias pull-request='pull-request -t $(/usr/bin/security find-generic-password -s github-token -a $USER -w)'
-
-
-# Livingdocs DroneCI
-export DRONE_SERVER=https://ci.livingdocs.io
-
-# TODO, support a secrets file or use $(/usr/bin/security find-generic-password -s drone-token -a $USER -w)
-export DRONE_TOKEN=token
+function keychain () {
+  /usr/bin/security find-generic-password -s $1 -a $USER -w
+}
 
 alias git-branch-cleanup='git branch --merged | grep -v "\*" | grep -v master | xargs -n 1 git branch -d'
 alias prunelocal='git branch --merged | ~/Development/marcbachmann/trim | xargs -n 1 git branch -d'
@@ -141,13 +134,13 @@ alias harmony='~/Development/marcbachmann/harmony/index.coffee'
 # experimental
 # alias s='subl .'
 function s () { subl ${1:-./} }
-alias t='./task.(js|coffee)'
-alias task=t
+function oni () { /Applications/Onivim2.App/Contents/MacOS/Oni2_editor --working-directory=$PWD/$1 }
 alias g='grunt '
-alias p='projects'
 alias a='open -a'
 alias gs='git status'
 alias package='nano package.json'
+alias grep='rg'
+alias lis='livingdocs-server'
 
 # alias psql='docker run --rm postgres psql'
 # alias pg_restore='docker run --rm postgres pg_restore'
@@ -240,7 +233,7 @@ alias gb='for k in `git branch | perl -pe s/^..//`; do echo -e `git show --prett
 # alias wombat="ensure-global-module wombat && command wombat"
 alias nodemon="execute-global nodemon"
 alias autocannon="execute-global autocannon"
-alias enterdocker="docker run --rm -it --privileged --pid=host walkerlee/nsenter -t 1 -m -u -i -n sh"
+alias enterdocker="docker run -it --rm --privileged --pid=host justincormack/nsenter1"
 alias 0x="execute-global 0x"
 alias now="execute-global now"
 alias nativetime="/usr/bin/time"
@@ -252,28 +245,30 @@ alias standard="execute-global standard"
 function sigstop () { kill -SIGSTOP `pgrep $1`; }
 function sigcont () { kill -SIGCONT `pgrep $1`; }
 
-function mb () {
-  local dir=~/Development/marcbachmann
-  [ -d "$dir/marcbachmann-$1" ] && cd "$dir/marcbachmann-$1" && return
-  [ -d "$dir/$1" ] && cd "$dir/$1" && return
-  echo "Failed to go to $dir/$1"
+function gotorepo () {
+  local dir=$HOME/Development/$1
+  [ -d "$dir/$1-$2/master" ] && $dir/$1-$2/master && return
+  [ -d "$dir/livingdocs-$2/master" ] && $dir/livingdocs-$2/master && return
+  [ -d "$dir/$2/master" ] && $dir/$2/master && return
+  [ -d "$dir/$1-$2" ] && $dir/$1-$2 && return
+  [ -d "$dir/livingdocs-$2" ] && $dir/livingdocs-$2 && return
+  [ -d "$dir/$2" ] && $dir/$2 && return
+  echo "Failed to go to $dir/$2"
 }
 
-function li () {
-  local dir=~/Development/livingdocsIO
-  [ -d "$dir/livingdocs-$1/master" ] && cd "$dir/livingdocs-$1/master" && return
-  [ -d "$dir/$1/master" ] && cd "$dir/$1/master" && return
-  [ -d "$dir/livingdocs-$1" ] && cd "$dir/livingdocs-$1" && return
-  [ -d "$dir/$1" ] && cd "$dir/$1" && return
-  echo "Failed to go to $dir/$1"
-}
+hash -d d="$HOME/Development"
+function mb () { gotorepo marcbachmann $1; }
+compctl -W ~d/marcbachmann/ -/ mb
 
-function nzz () {
-  local dir=~/Development/nzzdev
-  [ -d "$dir/livingdocs-$1" ] && cd "$dir/livingdocs-$1" && return
-  [ -d "$dir/$1" ] && cd "$dir/$1" && return
-  echo "Failed to go to $dir/$1"
-}
+function li () { gotorepo livingdocsIO $1; }
+compctl -W ~d/livingdocsIO/ -/ li
+
+function nzz () { gotorepo nzzdev $1; }
+compctl -W ~d/nzzdev/ -/ nzz
+
+function parent_completion () { reply=(`find .. -maxdepth 1 -type d -exec bash -c 'echo {} | sed -e "s/..\///"' \;`); }
+function p () { cd $PWD/../$1; }
+compctl -K parent_completion p
 
 function announce-greenkeeper () {
   curl -H "Content-Type: application/json" -X POST -d "{\"name\":\"$1\",\"version\":\"$2\"}" https://api.greenkeeper.io/webhooks/npm

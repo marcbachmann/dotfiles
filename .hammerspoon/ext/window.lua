@@ -15,7 +15,25 @@ local function nextElement(tbl, key, offset)
   end
 end
 
-module.moveToNextSpace = function(direction)
+local function flashScreen()
+  hs.applescript.applescript('beep')
+end
+
+module.goToNextSpace = function(direction)
+  -- local nextSpace = module.getNextSpace(direction)
+  -- if nextSpace == nil then return flashScreen() end
+
+  if direction == 'left' then
+    direction = 'o'
+  else
+    direction = 'p'
+  end
+
+  hs.eventtap.event.newKeyEvent({'shift', 'ctrl'}, direction, true):post()
+  hs.eventtap.event.newKeyEvent({'shift', 'ctrl'}, direction, false):post()
+end
+
+module.getNextSpace = function(direction)
   local offset = 1
   if direction == 'left' then offset = -1 end
 
@@ -24,15 +42,15 @@ module.moveToNextSpace = function(direction)
   local currentSpace = firstElement(win:spaces())
   if currentSpace == nil then return end
 
-  local nextSpace = nextElement(spaces.layout()[screenUUID], currentSpace, offset)
-  if nextSpace == nil then return end
+  return nextElement(spaces.layout()[screenUUID], currentSpace, offset)
+end
 
+module.moveToNextSpace = function(direction)
+  local win = hs.window.focusedWindow()
+  local nextSpace = module.getNextSpace(direction)
+  if nextSpace == nil then return flashScreen() end
   spaces.moveWindowToSpace(win:id(), nextSpace)
-
-  -- `changeToSpace` can't properly render the desktop image
-  -- so we'll navigate using a keystroke
-  -- spaces.changeToSpace(nextSpace)
-  hs.eventtap.keyStroke({"ctrl"}, direction)
+  module.goToNextSpace(direction)
 end
 
 module.getWindowUnderMouse = function()

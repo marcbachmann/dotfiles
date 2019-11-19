@@ -29,7 +29,7 @@
 		"*.jar",
 		"*.zip"
 	],
-	"color_scheme": "Packages/Boxy Theme/schemes/Boxy Yesterday.tmTheme",
+	"color_scheme": "Packages/ayu/ayu-mirage.tmTheme",
 	"ensure_newline_at_eof_on_save": true,
 	"folder_exclude_patterns":
 	[
@@ -38,20 +38,21 @@
 		".hg",
 		"CVS",
 		"node_modules",
+		"jspm_packages",
 		"bower_components",
+		"terraform.tfstate.backup",
+		"terraform.tfstate",
 		"coverage",
 		"dist",
 		".nyc_output",
 		".fusebox"
 	],
 	"font_face": "FiraCode-Regular",
-	"font_size": 16,
+	"font_size": 18,
 	"hot_exit": false,
 	"ignored_packages":
 	[
-		"Colorsublime",
-		"Vintage",
-		"Markdown"
+		"Vintage"
 	],
 	"ignored_words":
 	[
@@ -69,6 +70,6 @@
 	"show_tab_close_buttons": false,
 	"spell_check": true,
 	"tab_size": 2,
-	"theme": "Boxy Ocean.sublime-theme",
+	"theme": "ayu-mirage.sublime-theme",
 	"translate_tabs_to_spaces": true
 }

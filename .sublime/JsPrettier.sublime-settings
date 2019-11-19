@@ -1,3 +1,18 @@
 {
-  "prettier_cli_path": "prettier-standard-formatter"
+  "prettier_cli_path": "/Users/marcbachmann/.nvm/current/bin/prettier-standard-formatter",
+  "prettier_options": {
+      "printWidth": 101,
+      "tabWidth": 2,
+      "singleQuote": true,
+      "trailingComma": "none",
+      "bracketSpacing": true,
+      "jsxBracketSameLine": false,
+      "parser": "babel",
+      "semi": false,
+      "requirePragma": false,
+      "proseWrap": "preserve",
+      "arrowParens": "always",
+      "htmlWhitespaceSensitivity": "css",
+      "quoteProps": "as-needed"
+  }
 }

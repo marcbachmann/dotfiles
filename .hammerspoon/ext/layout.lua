@@ -25,6 +25,8 @@ module.getFrame = function(win, screen, layoutName)
   return frame
 end
 
+local diff = .2
+local maxDiff = .8
 module.isAtBorder = function(mousePos, screenFrame, bufferZone)
   if mousePos.y < bufferZone then -- touching top
     if mousePos.x < screenFrame.w * .2 then

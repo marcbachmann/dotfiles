@@ -1,0 +1,20 @@
+#compdef
+#autoload
+
+###-begin-livingdocs-server-completions-###
+#
+# yargs command completion script
+#
+# Installation: livingdocs-server completion >> ~/.zshrc
+#    or livingdocs-server completion >> ~/.zsh_profile on OSX.
+#
+_livingdocs-server_yargs_completions()
+{
+  local reply
+  local si=$IFS
+  IFS=$'\n' reply=($(COMP_CWORD="$((CURRENT-1))" COMP_LINE="$BUFFER" COMP_POINT="$CURSOR" livingdocs-server --get-yargs-completions "${words[@]}"))
+  IFS=$si
+  _describe 'values' reply
+}
+compdef _livingdocs-server_yargs_completions livingdocs-server
+###-end-livingdocs-server-completions-###

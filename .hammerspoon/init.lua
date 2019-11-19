@@ -4,6 +4,8 @@ local ipc = require("hs.ipc")
 local os = require("ext.os")
 local utils = require("ext.utils")
 local layout = require('ext.layout')
+local ax = require("hs._asm.axuielement")
+hs.ax = ax
 
 local ctrl = {"ctrl"}
 local cmd = {"cmd"}
@@ -141,6 +143,14 @@ local function config()
     hs.hints.windowHints()
   end)
 
+  hs.hotkey.bind(ctrl, 'left', function()
+    window.goToNextSpace('left')
+  end)
+
+  hs.hotkey.bind(ctrl, 'right', function()
+    window.goToNextSpace('right')
+  end)
+
   hs.hotkey.bind(ctrl_cmd, 'left', function()
     window.moveToNextSpace('left')
   end)
@@ -207,6 +217,7 @@ local function config()
   end
 
   local keyMapping = {
+    -- {key = 'F1', ondown = function() hs.brightness.set(hs.brightness.get() - 1) end},
     {key = 'F1', systemKey = 'BRIGHTNESS_DOWN'},
     {key = 'F2', systemKey = 'BRIGHTNESS_UP'},
     {key = 'F3', ondown = playsound},
@@ -215,7 +226,18 @@ local function config()
     {key = 'F5', systemKey = 'ILLUMINATION_DOWN'},
     {key = 'F6', systemKey = 'ILLUMINATION_UP'},
     {key = 'F7', systemKey = 'PREVIOUS', onrepeat = false},
-    {key = 'F8', systemKey = 'PLAY', onrepeat = false},
+    {
+      -- Fix the Play button to not open iTunes if tidal isn't open
+      key = 'F8',
+      onrepeat = false,
+      ondown = function()
+        local tidal = hs.application.get('TIDAL')
+        if tidal == nil then tidal = hs.application.open('TIDAL', 4, true) end
+
+        hs.eventtap.event.newKeyEvent(cmd, 'p', true):post(tidal)
+        hs.eventtap.event.newKeyEvent(cmd, 'p', false):post(tidal)
+      end
+    },
     {key = 'F9', systemKey = 'NEXT', onrepeat = false},
     {key = 'F10', systemKey = 'MUTE', onrepeat = false},
     {key = 'F11', systemKey = 'SOUND_DOWN'},
@@ -378,11 +400,17 @@ local function config()
             end
           end
         },
-        ["Enable Dark Mode"] = {
+        ["Dark Mode"] = {
           fn = function () setDarkMode(true) end
         },
         ["Disable Dark Mode"] = {
           fn = function () setDarkMode(false) end
+        },
+        ["Light Mode"] = {
+          fn = function () setDarkMode(false) end
+        },
+        ["Disable Light Mode"] = {
+          fn = function () setDarkMode(true) end
         },
         ["Branch Protection Rules"] = {
           url = "https://github.com/livingdocsIO/livingdocs-server/settings/branch_protection_rules/152491",
@@ -415,28 +443,58 @@ local function config()
   -- local appsToFix = {}
   -- appsToFix["Slack"] = true
   -- appsToFix["WhatsApp"] = true
+  hs.eventLogFile = io.open("event.log", "a")
+
+
+  hs.eventLogTimer = hs.timer.doEvery(1, function() hs.eventLogFile:flush() end)
+  hs.eventLogTimer:start()
+
 
   hs.myAppWatcher = hs.application.watcher.new(function(name, type, app)
-    print(name, type)
     -- fix annoying behavior in osx where apps that
     -- don't have a window open, aren't focused when
     -- opening the app using the application switcher (cmd+tab)
     if  type == hs.application.watcher.activated then
       -- and appsToFix[name] ~= nil
-      local screen = hs.mouse.getCurrentScreen()
       local win = app:focusedWindow()
       if win == nil then
-        hs.application.open(app:bundleID())
-        -- local win = app:focusedWindow()
-        -- if win ~= nil then
-	--  win:moveToScreen(screen)
-	-- end
-      -- else
-      --  win:moveToScreen(screen)
+        local bundleId = app:bundleID()
+        if bundleId == hs.myAppWatcherLastOpenedApp then return end
+
+        hs.application.open(bundleId)
+        hs.myAppWatcherLastOpenedApp = bundleId
+      else
+        -- Application focus event logger
+        local bundleId = app:bundleID()
+        local time = math.floor(hs.timer.secondsSinceEpoch() * 1000)
+        local winElement = hs.ax.windowElement(win)
+        local data = {}
+        data.title = winElement:title()
+
+        if bundleId == 'com.google.Chrome' then
+          local addressBar = winElement:elementSearch({title="Address and search bar"})[1]
+          if addressBar ~= nil then
+            data.url = addressBar:attributeValue('AXValue')
+          end
+        end
+
+        if bundleId == 'com.sublimetext.3' then
+          data.file = winElement:attributeValue("AXDocument")
+        end
+
+        -- -- to get the title, the following are the "official" methods:
+        -- element:attributeValue("AXTitle")
+        -- element:attributeValue(ax.attributes.general.title)
+        -- -- using the metamethods, which do an implicit `attributeValue` for you:
+        -- element:title()
+        -- element:AXTitle()
+
+        hs.eventLogFile:write(hs.json.encode({time=time, app=bundleId, data=data})..'\n')
       end
     end
   end)
 
+  hs.myAppWatcherLastOpenedApp = nil
   hs.myAppWatcher:start()
 
   function clear() hs.console.clearConsole() end
@@ -479,7 +537,7 @@ local function config()
         local mousePos = hs.mouse.getRelativePosition()
         local screen = hs.mouse.getCurrentScreen()
         local screenFrame = screen:frame()
-        local layoutName = layout.isAtBorder(mousePos, screenFrame, 100)
+        local layoutName = layout.isAtBorder(mousePos, screenFrame, 20)
         if layoutName ~= nil then
           local layoutFrame = layout.getFrame(dragging_window, screen, layoutName)
           highlighter:setFrame(layoutFrame)
@@ -496,7 +554,7 @@ local function config()
           local mousePos = hs.mouse.getRelativePosition()
           local screen = hs.mouse.getCurrentScreen()
           local screenFrame = screen:frame()
-          local layoutName = layout.isAtBorder(mousePos, screenFrame, 100)
+          local layoutName = layout.isAtBorder(mousePos, screenFrame, 20)
           local frame = layout.getFrame(dragging_window, screen, layoutName)
           if frame ~= nil then
             dragging_window:setFrame(frame)
@@ -646,12 +704,14 @@ local function config()
     ['Loremt'] = {
       fn = function()
         hs.eventtap.event.newKeyEvent({}, 'delete', true):post()
+        hs.eventtap.event.newKeyEvent({}, 'delete', false):post()
         pasteWord(' ipsum dolor sit amet, consectetur adipiscing elit')
       end
     },
     ['Loremp'] = {
       fn = function()
         hs.eventtap.event.newKeyEvent({}, 'delete', true):post()
+        hs.eventtap.event.newKeyEvent({}, 'delete', false):post()
         pasteWord(' ipsum dolor sit amet, consectetur adipiscing elit. Curabitur vitae lobortis ante. Vivamus metus magna, fringilla vel euismod id, interdum ultricies metus.')
       end
     },
@@ -666,7 +726,20 @@ local function config()
     [':kiss:'] = replaceWithFn(6, '😘'),
     [':kissing:'] = replaceWithFn(9, '😚'),
     [':hug:'] = replaceWithFn(5, '🤗'),
-    [':heart:'] = replaceWithFn(7, '❤️')
+    [':heart:'] = replaceWithFn(7, '❤️'),
+    [':inlove:'] = replaceWithFn(8, '🥰'),
+    ['ILY'] = {
+      fn = function()
+        local word = 'ILoveYou'
+        deleteChars(3)
+        for i = 1, #word do
+          lastchar = word:sub(i, i)
+          hs.eventtap.keyStrokes(lastchar)
+          hs.eventtap.event.newKeyEvent({}, 'return', true):post()
+          hs.eventtap.event.newKeyEvent({}, 'return', false):post()
+        end
+      end
+    }
   }
 
   local wordTree = {}
@@ -749,6 +822,76 @@ local function config()
   end)
 
   keyPressWatcher:start()
+
+  -- hs.window.filter.default:subscribe(hs.window.filter.windowFocused, function(window, appName)
+  --   if hs.focusedWindowCanvas ~= nil then
+  --     hs.focusedWindowCanvas:delete()
+  --     hs.focusedWindowCanvas = nil
+  --   end
+
+  --   if window:isStandard() == false then return end
+
+  --   local frame = window:screen():fullFrame()
+  --   local canvas = hs.canvas.new(frame):show()
+  --   hs.focusedWindowCanvas = canvas
+  --   canvas:insertElement({ type = "rectangle", id = "overlay", fillColor = {red = 0.1, green = 0.1, blue = 0.1, alpha = 0.25} })
+  --   local windowLevel = canvas:level() - 10
+  --   canvas:level(windowLevel)
+  -- end)
+
+
+  -- local mousePos = hs.mouse.getRelativePosition()
+  -- local screen = hs.mouse.getCurrentScreen()
+  -- local screenFrame = screen:frame()
+
+  -- local frame = dragging_window:frame()
+  -- local screens = hs.screen.allScreens()
+  -- for i=2, #screens, 1 do
+  --   if direction == 'east' then
+  --     current = current:toWest()
+  --   else
+  --     current = current:toEast()
+  --   end
+  -- end
+
+  -- window dimmer
+  -- hs.window.highlight.ui.overlay = true
+  -- hs.window.highlight.ui.overlayColor = {0.1,0.1,0.1,0.25}
+  -- hs.window.highlight.start()
+
+  -- hs.focusedWindowCanvas = nil
+  -- hs.window.filter.default:subscribe(hs.window.filter.windowFocused, function(window, appName)
+  --   if hs.focusedWindow ~= nil then
+  --     hs.focusedWindowCanvas:hide()
+  --     hs.focusedWindowCanvas = nil
+  --   end
+  --   alert('Focused: ' .. window:title())
+  -- end)
+  -- a = hs.canvas.new{x=100,y=100,h=500,w=500}:appendElements( {
+  -- -- first we start with a rectangle that covers the full canvas
+  --     action = "build",
+  --     padding = 0,
+  --     type = "rectangle"
+  --   }, {
+  -- -- and we end it it with a smaller circle, which should show content
+  --     action = "clip", padding = 0, radius = ".1", type = "circle"
+  --   }, {
+  -- -- now, draw a rectangle in the upper left
+  --     action = "fill",
+  --     fillColor = { alpha = 0.5, green = 1.0  },
+  --     frame = { x = "0", y = "0", h = ".75", w = ".75", },
+  --     type = "rectangle",
+  --     withShadow = true,
+  --   }, {
+  -- -- reset our clipping changes added with elements 1, 2, and 3
+  --     type = "resetClip"
+  --   }, {
+  -- -- and cover the whole thing with a semi-transparent rectangle
+  --     action = "fill",
+  --     fillColor = { alpha = 0.25, blue = 0.5, green = 0.5  },
+  --     frame = { h = 500.0, w = 500.0, x = 0.0, y = 0.0 },
+  --     type = "rectangle",
+  --   } ):show()
 end
 
 config()

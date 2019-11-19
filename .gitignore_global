@@ -23,8 +23,7 @@
 # Logs and databases #
 ######################
 *.log
-*.sql
-*.sqlite
+*.sqlite*
 dump.rdb
 
 # OS generated files #
