@@ -1,19 +1,40 @@
 . {
+  # watch
   reload
   nsid mbp2015.marcbachmann.local
 
-  hosts {
-    fallthrough
+  log . {
+    class denial success
+  }
+
+  cache {
+    success 4096 60 5
+    denial 4096 60 5
+    prefetch 1 5m
+    serve_stale 24h
   }
 
   loadbalance round_robin
-  forward . 8.8.8.8:53 8.8.4.4:53
+  # file /Users/marcbachmann/.dotfiles/coredns/fake.livingdocs.zone
 
-  cache {
-    success 5000 60 5
-    denial 2500 60 5
-    prefetch 1
+  hosts {
+    #46.101.138.141 livingdocs.io
+    #134.209.250.128 livingdocs.io
+    #142.93.164.111 livingdocs.io
+
+
+    #134.209.250.84 develop.livingdocs.io
+
+    62.240.129.196 edit.heute.at
+    62.240.129.180 edit.heute.at
+
+    62.240.129.196 server.heute.at
+    62.240.129.180 server.heute.at
+
+    fallthrough
   }
+  #forward . edna.ns.cloudflare.com
+  forward . 8.8.8.8 1.1.1.1 80.254.79.157
 
   errors
 
