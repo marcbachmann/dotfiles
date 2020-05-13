@@ -1,0 +1,18 @@
+_local_ssh_suggestion () {
+  local cur prev opts
+  COMPREPLY=()
+  cur="${COMP_WORDS[COMP_CWORD]}"
+  prev="${COMP_WORDS[COMP_CWORD-1]}"
+
+  if [ -f "$FILE" ]; then
+    opts=$(sed -n "s/Host \([a-z][a-z0-9_\.\-]\+\).*/\1/p" .ssh/config ~/.ssh/config)
+  else
+    opts=$(sed -n "s/Host \([a-z][a-z0-9_\.\-]\+\).*/\1/p" ~/.ssh/config)
+  fi
+
+  COMPREPLY=( $(compgen -W "$opts" -- ${cur}) )
+  return 0
+}
+
+complete -F _local_ssh_suggestion socks
+

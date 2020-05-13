@@ -215,6 +215,8 @@ popline () {
   sed -i '' -e '$ d' $1
 }
 
+function drone () { DRONE_SERVER=https://drone.livingdocs.io /usr/local/bin/drone --autoscaler https://ci-autoscaler.livingdocs.io $@ }
+
 function ensure-global-module {
   /usr/bin/which "${2:-$1}" &> /dev/null || npm install -g $1
 }
