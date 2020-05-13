@@ -7,7 +7,9 @@
 		"eventsourced",
 		"elasticsearch",
 		"metadata",
-		"init"
+		"init",
+		"http",
+		"html"
 	],
 	"additional_path_items":
 	[
@@ -29,7 +31,7 @@
 		"*.jar",
 		"*.zip"
 	],
-	"color_scheme": "Packages/ayu/ayu-mirage.tmTheme",
+	"color_scheme": "Packages/Boxy Theme/schemes/Boxy Yesterday.tmTheme",
 	"ensure_newline_at_eof_on_save": true,
 	"folder_exclude_patterns":
 	[
@@ -70,6 +72,6 @@
 	"show_tab_close_buttons": false,
 	"spell_check": true,
 	"tab_size": 2,
-	"theme": "ayu-mirage.sublime-theme",
+	"theme": "Boxy Yesterday.sublime-theme",
 	"translate_tabs_to_spaces": true
 }

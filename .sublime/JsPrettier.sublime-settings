@@ -1,5 +1,5 @@
 {
-  "prettier_cli_path": "/Users/marcbachmann/.nvm/current/bin/prettier-standard-formatter",
+  "prettier_cli_path": "/Users/marcbachmann/.fnm/current/bin/prettier-standard-formatter",
   "prettier_options": {
       "printWidth": 101,
       "tabWidth": 2,
