@@ -33,6 +33,7 @@ alias top=htop
 alias psql=/usr/local/opt/libpq/bin/psql
 export PGHOST=localhost
 export PGUSER=postgres
+export PGPASSFILE=$HOME/.pgpass
 
 export SUBLIME_LIGHT_COLOR_SCHEME='"Packages/Boxy Theme/schemes/Boxy Yesterday.tmTheme"'
 export SUBLIME_LIGHT_THEME='"Boxy Yesterday.sublime-theme"'
