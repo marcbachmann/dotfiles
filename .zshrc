@@ -1,6 +1,5 @@
 # export DISABLE_MAGIC_FUNCTIONS=true
-fpath=("$HOME/.dotfiles/.zsh/completions" $fpath)
-PATH=$PATH:/usr/local/bin:$HOME/bin
+PATH=/usr/local/opt/curl/bin:/usr/local/opt/gnu-sed/libexec/gnubin:$PATH:/usr/local/bin:$HOME/bin
 export DEFAULT_USER="marcbachmann"
 setopt histignorespace
 
@@ -9,6 +8,7 @@ ulimit -n 10000
 # ulimit -u 2096
 
 # iTerm configuration
+export TERM=xterm-256color
 test -e $HOME/.iterm2_shell_integration.zsh && source $HOME/.iterm2_shell_integration.zsh
 
 # export NVM_DIR=$HOME/.nvm
@@ -25,6 +25,7 @@ if [ $TERM_PROGRAM = "iTerm.app" ] || [ $TERM_PROGRAM = "Hyper" ]; then
 fi
 
 # Node
+alias inspect='node --inspect-brk'
 alias npme='PATH=$(npm bin):$PATH'
 alias npmo='npm install --offline'
 alias npmclean="rm -Rf ./node_modules && npm install"
@@ -48,7 +49,6 @@ meteo () { curl -4 "http://wttr.in/$(echo ${@:-zurich} | tr ' ' _)" }
 autoload -U +X bashcompinit && bashcompinit
 complete -o nospace -C /usr/local/bin/terraform terraform
 
-
 # fnm
 eval "$(fnm env --multi)"
 
@@ -62,3 +62,16 @@ _fnm_autoload_hook () {
 }
 
 add-zsh-hook chpwd _fnm_autoload_hook && _fnm_autoload_hook
+
+source /Users/marcbachmann/Library/Preferences/org.dystroy.broot/launcher/bash/br
+
+# The following lines were added by compinstall
+zstyle :compinstall filename '/Users/marcbachmann/.zshrc'
+
+autoload -Uz compinit
+compinit
+
+# End of lines added by compinstall
+
+# Source all completions
+for f in ~/.dotfiles/.zsh/completions/*; do source $f; done
