@@ -2,9 +2,9 @@
   ui = true
 
 [user]
-	name = Marc Bachmann
+  name = Marc Bachmann
   user = marcbachmann
-	email = marc.brookman@gmail.com
+  email = marc.brookman@gmail.com
   signingkey = 001884E1441067E1
 
 [core]
@@ -27,7 +27,8 @@
   wd = diff --word-diff
   co = checkout
   chekcout = checkout
-  b = branch -v
+  cehckout = checkout
+  b = branch -v --sort=committerdate
   branch-history = "for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'"
   ls = !ls
   ri = rebase --interactive --autosquash
@@ -72,3 +73,7 @@
 [mergetool "sourcetree"]
   cmd = /Applications/Sourcetree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
   trustExitCode = true
+
+[merge "npm-merge-driver"]
+	name = automatically merge npm lockfiles
+	driver = npx npm-merge-driver merge %A %O %B %P
