@@ -20,7 +20,8 @@ spec:
   ~/.grc: .grc
   ~/.ssh/config: .ssh/config
   ~/.hammerspoon: .hammerspoon
-  ~/.homebridge: homebridge
-  ~/.homeassistant: homeassistant
+  ~/.iterm2: iterm2
+  #~/.homebridge: homebridge
+  #~/.homeassistant: homeassistant
   ~/Library/Application Support/Sublime Text 3/Packages/User/: .sublime
   #/Library/LaunchDaemons/local.marcbachmann.coredns.plist: ./coredns/service.plist
