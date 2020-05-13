@@ -86,6 +86,7 @@ alias h2url='execute-global h2url'
 #export DOCKER_IP=$(ipconfig getifaddr en0)
 #export DOCKER_IP="localhost"
 # open-docker () { open "http://$DOCKER_IP:${1:-80}" }
+export DOCKER_BUILDKIT=1
 
 alias dockerattach='screen ~/Library/Containers/com.docker.docker/Data/vms/0/tty'
 alias dc='docker-compose'
