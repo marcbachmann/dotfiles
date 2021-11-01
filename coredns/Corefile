@@ -1,4 +1,4 @@
-. {
+.:53 {
   # watch
   reload
   nsid mbp2015.marcbachmann.local
@@ -11,11 +11,18 @@
     success 4096 60 5
     denial 4096 60 5
     prefetch 1 5m
-    serve_stale 24h
+    serve_stale 1440m
   }
 
   loadbalance round_robin
-  # file /Users/marcbachmann/.dotfiles/coredns/fake.livingdocs.zone
+  file /Users/marcbachmann/.dotfiles/coredns/zones/kicker.dev kicker.dev
+  file /Users/marcbachmann/.dotfiles/coredns/zones/local.dev local.dev
+  file /Users/marcbachmann/.dotfiles/coredns/zones/heute.dev heute.dev
+
+  # auto dev {
+  #   directory /Users/marcbachmann/.dotfiles/coredns/zones
+  # }
+
 
   hosts {
     #46.101.138.141 livingdocs.io
@@ -25,16 +32,21 @@
 
     #134.209.250.84 develop.livingdocs.io
 
-    62.240.129.196 edit.heute.at
-    62.240.129.180 edit.heute.at
+    #62.240.129.196 edit.heute.at
+    #62.240.129.180 edit.heute.at
 
-    62.240.129.196 server.heute.at
-    62.240.129.180 server.heute.at
+    62.240.129.198 editor-dev.heute.at
+    #62.240.129.180 server.heute.at
+    #127.0.0.1 admin.local
+    127.0.0.1 livingdocs.standard.at
+    127.0.0.1 bluewin-cms.dev.sctv.ch
 
     fallthrough
   }
   #forward . edna.ns.cloudflare.com
-  forward . 8.8.8.8 1.1.1.1 80.254.79.157
+  # forward . 8.8.8.8 1.1.1.1 80.254.79.157
+  forward . tls://2606:4700:4700::1111 tls://1.1.1.1
+
 
   errors
 

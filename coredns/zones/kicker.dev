@@ -1,0 +1,12 @@
+$TTL 60
+$ORIGIN kicker.dev.
+@           IN  SOA  kicker.dev. admin.kicker.dev. (
+                     2017072305 ; Serial
+                     4H         ; Refresh
+                     1H         ; Retry
+                     7D         ; Expire
+                     4H )       ; Negative Cache TTL
+
+@                 IN  A    127.0.0.1
+*.kicker.dev.     IN  A    127.0.0.1
+admin.kicker.dev. IN  A    127.0.0.1

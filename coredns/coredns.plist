@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>Label</key>
+    <string>local.marcbachmann.coredns</string>
+    <key>ProgramArguments</key>
+    <array>
+      <string>/bin/zsh</string>
+      <string>-c</string>
+      <string>/Users/marcbachmann/.dotfiles/coredns/coredns -conf /Users/marcbachmann/.dotfiles/coredns/Corefile 2&gt; &gt;(/usr/local/bin/ts -m '[%Y-%m-%d %H:%M:%S] -' 1&gt;&amp;2) 1&gt; &gt;(/usr/local/bin/ts -m '[%Y-%m-%d %H:%M:%S] -')</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+    <key>WorkingDirectory</key>
+    <string>/Users/marcbachmann/.dotfiles/coredns</string>
+    <key>StandardOutPath</key>
+    <string>/var/log/coredns.log</string>
+    <key>StandardErrorPath</key>
+    <string>/var/log/coredns.log</string>
+  </dict>
+</plist>
