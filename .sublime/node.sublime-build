@@ -1,7 +1,0 @@
-{
-  "cmd": ["/Users/marcbachmann/.nvm/current/bin/node", "$file"],
-  "selector": "source.js",
-  "windows" : {
-     "shell": true
-  }
-}
