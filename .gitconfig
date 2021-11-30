@@ -51,10 +51,6 @@
   smudge = git-lfs smudge %f
   required = true
 
-[gist]
-  username = marcbachmann
-  token = fcf40c57c2f64361a00349adba77bb89dc48fbcd
-
 [rerere]
   enabled = true
 
