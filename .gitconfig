@@ -33,11 +33,12 @@
   ls = !ls
   ri = rebase --interactive --autosquash
   fixup = commit --fixup
-  append = "!f() { (git diff-files --quiet || (echo Unstaged changes, please commit or stash with --keep-index; exit 1)) && COMMIT=$(git rev-parse $1) && git commit --fixup=$COMMIT && GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash $COMMIT~1; }; f"
-  appendk = "!f() { git stash -k && COMMIT=$(git rev-parse $1) && git commit --fixup=$COMMIT && GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash $COMMIT~1 && git stash pop; }; f"
+  appendr = "!f() { (git diff-files --quiet || (echo Unstaged changes, please commit or stash with --keep-index; exit 1)) && COMMIT=$(git rev-parse $1) && git commit --fixup=$COMMIT && GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash $COMMIT~1; }; f"
+  append = "!f() { git stash -k && COMMIT=$(git rev-parse $1) && git commit --fixup=$COMMIT && GIT_SEQUENCE_EDITOR=: git rebase -i --autosquash $COMMIT~1 && git stash pop; }; f"
   fetch-pr = "!f() { git fetch origin refs/pull/$1/head:pr/$1; } ; f"
   checkout-pr = "!f() { git fetch origin refs/pull/$1/head:pr/$1; } ; f"
   branch-delete = !$HOME/.dotfiles/branch-delete.sh
+  branch-cleanup = !$HOME/.dotfiles/branch-cleanup.sh
   branchd = !$HOME/.dotfiles/branch-delete.sh
   diff-list = diff --name-only
   repo = !hub browse
