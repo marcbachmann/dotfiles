@@ -29,6 +29,7 @@ module.goToNextSpace = function(direction)
     direction = 'p'
   end
 
+  -- Change the Move left a space binding to shift+ctrl+o first
   hs.eventtap.event.newKeyEvent({'shift', 'ctrl'}, direction, true):post()
   hs.eventtap.event.newKeyEvent({'shift', 'ctrl'}, direction, false):post()
 end
