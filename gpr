@@ -1,0 +1,26 @@
+#!/bin/bash
+DEFAULT_BRANCH=master
+if [ -n "$(git branch --list main)" ]; then DEFAULT_BRANCH=main; fi
+
+BASE_BRANCH=$DEFAULT_BRANCH
+PREFERRED_BASE_BRANCH="$(jq -r '.release.branch // .release.branches[0] // ""' package.json 2> /dev/null)"
+if [[ "$PREFERRED_BASE_BRANCH" != "" ]]; then BASE_BRANCH="$PREFERRED_BASE_BRANCH"; fi
+
+BRANCH=$(git rev-parse --abbrev-ref HEAD)
+TITLE="$1"
+BODY=""
+if [[ "$BRANCH" == "backport/"* ]]; then
+  PRID=$(sed 's:backport/\([0-9]\+\)/.*:\1:' <<< "$BRANCH")
+  PRDATA=$(gh pr view https://github.com/livingdocsIO/livingdocs-server/pull/$PRID)
+  BODY=$(echo -e "$PRDATA" | sed -e '1,/--/d')
+  TITLE=$(sed -n -e '1 s/title:\s\(.*\)/\1/p' <<< "$PRDATA")
+  if [ "$BASE_BRANCH" != "master" ]; then TITLE="$TITLE [$BASE_BRANCH]"; fi
+fi
+
+if [ "$BODY" == "" ]; then
+  TEMPLATE=$(find "$(git rev-parse --show-toplevel)/.github" -type f -iname "PULL_REQUEST_TEMPLATE.md" 2&> /dev/null || echo '')
+  if [ "$TEMPLATE" != "" ]; then BODY=$(cat $TEMPLATE); fi
+fi
+
+if [ "$TITLE" == "" ]; then TITLE=$(git log -1 --oneline --format=%s | sed 's/^.*: //'); fi
+gh pr create --draft --base $BASE_BRANCH -b "$BODY" --head $BRANCH --title "$TITLE"

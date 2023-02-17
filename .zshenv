@@ -110,10 +110,7 @@ alias opentcp="lsof -iTCP -sTCP:LISTEN"
 
 # git pull-request requires hub: https://github.com/github/hub
 export git='hub'
-function gpr () {
-  local base=$((cat package.json || echo '{"release":{"branch": "master"}}') 2> /dev/null | jq -r '.release.branch // "master"')
-  hub pull-request -b "$base" -m "$1" | tail -1 | pbcopy;
-}
+alias gpr='~/.dotfiles/gpr'
 alias gpur='gpu && gpr'
 alias gr='git reset --hard'
 grh () { git reset --hard "HEAD~$1"; }
