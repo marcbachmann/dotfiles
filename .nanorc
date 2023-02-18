@@ -73,3 +73,5 @@ set nowrap
 # set const
 # set linenumbers
 # set constantshow
+set tabsize 2
+set tabstospaces
