@@ -11,7 +11,8 @@ TITLE="$1"
 BODY=""
 if [[ "$BRANCH" == "backport/"* ]]; then
   PRID=$(sed 's:backport/\([0-9]\+\)/.*:\1:' <<< "$BRANCH")
-  PRDATA=$(gh pr view https://github.com/livingdocsIO/livingdocs-server/pull/$PRID)
+  REPOURL=$(gh repo view --jq '.url' --json url)
+  PRDATA=$(gh pr view $REPOURL/pull/$PRID)
   BODY=$(echo -e "$PRDATA" | sed -e '1,/--/d')
   TITLE=$(sed -n -e '1 s/title:\s\(.*\)/\1/p' <<< "$PRDATA")
   if [ "$BASE_BRANCH" != "master" ]; then TITLE="$TITLE [$BASE_BRANCH]"; fi
