@@ -1,7 +1,6 @@
-antigen use oh-my-zsh
-antigen bundle zsh-users/zsh-syntax-highlighting
-antigen bundle zsh-users/zsh-autosuggestions
-# antigen bundle lukechilds/zsh-nvm
+# antigen use oh-my-zsh
+# antigen bundle zsh-users/zsh-syntax-highlighting
+# antigen bundle zsh-users/zsh-autosuggestions
 antigen bundle lukechilds/zsh-better-npm-completion
-antigen theme agnoster
+# antigen theme agnoster
 antigen apply

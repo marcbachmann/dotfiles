@@ -22,7 +22,7 @@ brew "awscli"
 brew "bash-completion@2"
 brew "bat"
 brew "bison"
-brew "gettext"
+brew "broot"
 brew "libffi"
 brew "pixman"
 brew "carthage"
@@ -31,8 +31,6 @@ brew "cmake"
 brew "curl"
 brew "nghttp2"
 brew "curl-openssl"
-brew "pth"
-brew "dirmngr"
 brew "doctl"
 brew "emacs"
 brew "openjpeg"
@@ -75,6 +73,7 @@ brew "openssh"
 brew "osquery"
 brew "pinentry-mac"
 brew "pspg"
+brew "pth"
 brew "py2cairo"
 brew "py3cairo"
 brew "pygobject3"
@@ -90,18 +89,32 @@ brew "trash"
 brew "watch"
 brew "wget"
 brew "wrk"
+brew "yq"
 brew "fangli/dev/rancherssh"
 brew "getantibody/tap/antibody"
 brew "go-task/tap/go-task"
 brew "schniz/tap/fnm"
-brew "talal/tap/bonclay"
+cask "docker"
+cask "font-menlo-for-powerline"
+cask "fork"
+cask "google-chrome"
+cask "hammerspoon"
+cask "iterm2"
+cask "sublime-text"
+cask "tableplus"
+cask "tidal"
+cask "transmit"
+cask "vlc"
+cask "webtorrent"
 mas "1Password 7", id: 1333542190
 mas "Deckset", id: 847496013
 mas "Evernote", id: 406056744
+mas "GarageBand", id: 682658836
 mas "iMovie", id: 408981434
 mas "Keynote", id: 409183694
 mas "Microsoft Remote Desktop", id: 1295203466
 mas "Numbers", id: 409203825
 mas "Pages", id: 409201541
+mas "Slack", id: 803453959
 mas "WhatsApp", id: 1147396723
 mas "Xcode", id: 497799835

@@ -8,5 +8,5 @@ $ORIGIN local.dev.
                      4H )       ; Negative Cache TTL
 
 @                IN  A    127.0.0.1
-*.local.dev.     IN  A    127.0.0.1
 admin.local.dev. IN  A    127.0.0.1
+*.local.dev.     IN  A    127.0.0.1

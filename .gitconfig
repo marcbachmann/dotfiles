@@ -18,6 +18,9 @@
 [push]
   default = upstream
 
+[pull]
+  twohead = ort
+
 [alias]
   authors = log --format='%aN <%aE>'
   lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
@@ -29,6 +32,7 @@
   chekcout = checkout
   cehckout = checkout
   b = branch -v --sort=committerdate
+  bh = branch-history
   branch-history = "for-each-ref --sort=committerdate refs/heads/ --format='%(committerdate:short) %(refname:short)'"
   ls = !ls
   ri = rebase --interactive --autosquash
@@ -43,6 +47,7 @@
   diff-list = diff --name-only
   repo = !hub browse
   default = "!f() { git checkout $(sed -n 's/^.*worktrees\\///p' < ./$(git rev-parse --show-prefix).git); }; f"
+  applypb = "!pbpaste | git apply"
 
 [credential]
   helper = osxkeychain

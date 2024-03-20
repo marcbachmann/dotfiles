@@ -10,8 +10,8 @@
   cache {
     success 4096 60 5
     denial 4096 60 5
-    prefetch 1 5m
-    serve_stale 1440m
+    prefetch 1 5m 50%
+    serve_stale 60m
   }
 
   loadbalance round_robin
@@ -25,6 +25,7 @@
 
 
   hosts {
+    127.0.0.1 node-0.example.com
     #46.101.138.141 livingdocs.io
     #134.209.250.128 livingdocs.io
     #142.93.164.111 livingdocs.io
@@ -44,8 +45,8 @@
     fallthrough
   }
   #forward . edna.ns.cloudflare.com
-  # forward . 8.8.8.8 1.1.1.1 80.254.79.157
-  forward . tls://2606:4700:4700::1111 tls://1.1.1.1
+  forward . 8.8.8.8 1.1.1.1 80.254.79.157
+  # forward . tls://2606:4700:4700::1111 tls://1.1.1.1
 
 
   errors

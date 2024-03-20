@@ -4,15 +4,15 @@ set -eu
 echo "Set default OSX configs"
 ./defaults.sh
 
-brew -v > /dev/null && echo 'Homebrew is already present' || echo "Install homebrew" && ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-
-echo "Change default shell to zsh"
-chsh -s /bin/zsh
+# brew -v > /dev/null && echo 'Homebrew is already present' || echo "Install homebrew" && /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install.sh)"
 
 echo "Install apps listed in Brewfile"
-brew bundle
+brew bundle install
 
 echo "Copy all dotfiles into $HOME"
-bonclay sync bonclay.conf.yaml
+./sync.sh
 
-sudo launchctl load -w $PWD/coredns/service.plist
+# Fix compaudit permissions
+compaudit | xargs chmod g-w
+
+# launchctl load ~/Library/LaunchAgents/local.marcbachmann.coredns.plist

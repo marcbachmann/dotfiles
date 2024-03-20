@@ -6,7 +6,6 @@
 --- and on [code by VFS](https://github.com/VFS/.hammerspoon/blob/master/tools/clipboard.lua), but with many changes and some contributions and inspiration from [asmagill](https://github.com/asmagill/hammerspoon-config/blob/master/utils/_menus/newClipper.lua).
 ---
 --- Download: [https://github.com/Hammerspoon/Spoons/raw/master/Spoons/ClipboardTool.spoon.zip](https://github.com/Hammerspoon/Spoons/raw/master/Spoons/ClipboardTool.spoon.zip)
-
 local obj={}
 obj.__index = obj
 
@@ -29,21 +28,6 @@ obj.frequency = 0.8
 --- Variable
 --- How many items to keep on history. Defaults to 100
 obj.hist_size = 100
-
---- ClipboardTool.max_entry_size
---- Variable
---- maximum size of a text entry
-obj.max_entry_size = 4990
-
---- ClipboardTool.max_size
---- Variable
---- Whether to check the maximum size of an entry. Defaults to `false`.
-obj.max_size = getSetting('max_size', false)
-
---- ClipboardTool.show_copied_alert
---- Variable
---- If `true`, show an alert when a new item is added to the history, i.e. has been copied.
-obj.show_copied_alert = true
 
 --- ClipboardTool.honor_ignoredidentifiers
 --- Variable
@@ -96,8 +80,8 @@ obj.show_in_menubar = true
 
 --- ClipboardTool.menubar_title
 --- Variable
---- String to show in the menubar if `ClipboardTool.show_in_menubar` is `true`. Defaults to `"\u{1f4cb}"`, which is the [Unicode clipboard character](https://codepoints.net/U+1F4CB)
-obj.menubar_title   = "\u{1f4cb}"
+--- String to show in the menubar if `ClipboardTool.show_in_menubar` is `true`. Defaults to SF Symbols `list.clipboard`
+obj.menubar_title   = "􀒖" -- "􁕜"
 
 ----------------------------------------------------------------------
 
@@ -113,25 +97,12 @@ local hashfn   = require("hs.hash").MD5
 
 -- Keep track of last change counter
 local last_change = nil;
--- Array to store the clipboard history
-local clipboard_history = nil
-
--- Internal function - persist the current history so it survives across restarts
-function _persistHistory()
-   setSetting("items",clipboard_history)
-end
 
 --- ClipboardTool:togglePasteOnSelect()
 --- Method
 --- Toggle the value of `ClipboardTool.paste_on_select`
 function obj:togglePasteOnSelect()
    self.paste_on_select = setSetting("paste_on_select", not self.paste_on_select)
-   hs.notify.show("ClipboardTool", "Paste-on-select is now " .. (self.paste_on_select and "enabled" or "disabled"), "")
-end
-
-function obj:toggleMaxSize()
-   self.max_size = setSetting("max_size", not self.max_size)
-   hs.notify.show("ClipboardTool", "Max Size is now " .. (self.max_size and "enabled" or "disabled"), "")
 end
 
 -- Internal method - process the selected item from the chooser. An item may invoke special actions, defined in the `actions` variable.
@@ -139,8 +110,7 @@ function obj:_processSelectedItem(value)
    local actions = {
       none = function() end,
       clear = hs.fnutils.partial(self.clearAll, self),
-      toggle_paste_on_select = hs.fnutils.partial(self.togglePasteOnSelect, self),
-      toggle_max_size = hs.fnutils.partial(self.toggleMaxSize, self),
+      toggle_paste_on_select = hs.fnutils.partial(self.togglePasteOnSelect, self)
    }
    if self.prevFocusedWindow ~= nil then
       self.prevFocusedWindow:focus()
@@ -148,16 +118,12 @@ function obj:_processSelectedItem(value)
    if value and type(value) == "table" then
       if value.action and actions[value.action] then
          actions[value.action](value)
-      elseif value.text then
-         if value.type == "text" then
-            pasteboard.setContents(value.text)
-         elseif value.type == "image" then 
-            pasteboard.writeObjects(hs.image.imageFromURL(value.data))
-         end
---         self:pasteboardToClipboard(value.text)
-         if (self.paste_on_select) then
-            hs.eventtap.keyStroke({"cmd"}, "v")
-         end
+      elseif value.type == 'text' then
+        pasteboard.setContents(value.data)
+        if (self.paste_on_select) then hs.eventtap.keyStroke({"cmd"}, "v") end
+      elseif value.type == "image" then
+        pasteboard.writeObjects(hs.image.imageFromURL(value.data))
+        if (self.paste_on_select) then hs.eventtap.keyStroke({"cmd"}, "v") end
       end
       last_change = pasteboard.changeCount()
    end
@@ -168,8 +134,7 @@ end
 --- Clears the clipboard and history
 function obj:clearAll()
    pasteboard.clearContents()
-   clipboard_history = {}
-   _persistHistory()
+   obj.db:exec("DELETE FROM clipboard;")
    last_change = pasteboard.changeCount()
 end
 
@@ -177,28 +142,19 @@ end
 --- Method
 --- Clears the last added to the history
 function obj:clearLastItem()
-   table.remove(clipboard_history, 1)
-   _persistHistory()
+   obj.db:exec("DELETE FROM clipboard WHERE id = (SELECT MAX(id) FROM clipboard);")
    last_change = pasteboard.changeCount()
 end
 
--- Internal method: deduplicate the given list, and restrict it to the history size limit
-function obj:dedupe_and_resize(list)
-   local res={}
-   local hashes={}
-   for i,v in ipairs(list) do
-      if #res < self.hist_size then
-         local hash=hashfn(v.content)
-         if (not self.deduplicate) or (not hashes[hash]) then
-            table.insert(res, v)
-            hashes[hash]=true
-         end
-      end
-   end
-   return res
+function executeStatement(stmt, ...)
+  stmt:bind_values(...)
+  local t = {}
+  for row in stmt:nrows() do table.insert(t, row) end
+  stmt:reset()
+  return t
 end
 
---- ClipboardTool:pasteboardToClipboard(item)
+--- ClipboardTool:pasteboardToClipboard('text|image', item)
 --- Method
 --- Add the given string to the history
 ---
@@ -207,155 +163,139 @@ end
 ---
 --- Returns:
 ---  * None
-function obj:pasteboardToClipboard(item_type, item)
-   table.insert(clipboard_history, 1, {type=item_type, content=item})
-   clipboard_history = self:dedupe_and_resize(clipboard_history)
-   _persistHistory() -- updates the saved history
-end
-
--- Internal method: actions of the context menu, special paste
-function obj:pasteAllWithDelimiter(row, delimiter)
-  if self.prevFocusedWindow ~= nil then
-      self.prevFocusedWindow:focus()
-   end
-   print("pasteAllWithTab row:" .. row)
-   for ix = row, 1, -1 do
-     local entry = clipboard_history[ix]
-     print("pasteAllWithTab ix:" .. ix .. ":" .. entry)
---      pasteboard.setContents(entry)
---      os.execute("sleep 0.2")
---      hs.eventtap.keyStroke({"cmd"}, "v")
-       hs.eventtap.keyStrokes(entry.content)
---      os.execute("sleep 0.2")
-      hs.eventtap.keyStrokes(delimiter)
---      os.execute("sleep 0.2")
-   end
+function obj:pasteboardToClipboard(timestamp, itemType, content)
+  self.logger.df("Set content = %s", hs.inspect(content))
+  executeStatement(obj.dbInsertItem, hashfn(content), timestamp, itemType, content)
 end
 
 -- Internal method: actions of the context menu, delete or rearrange of clips
-function obj:manageClip(row, action)
-    print("manageClip row:" .. row .. ",action:" .. action)
-    if action == 0 then
-      table.remove (clipboard_history, row)
-    elseif action == 2 then
-      	local i = 1
-        local j = row
-        while i < j do
-          clipboard_history[i], clipboard_history[j] = clipboard_history[j], clipboard_history[i]
-          i = i + 1
-          j = j - 1
-        end
-    else
-      local value = clipboard_history[row]
-      local new = row + action
-      if new < 1 then new = 1 end
-      if new < row then
-        table.move(clipboard_history, new, row - 1, new + 1)
-      else
-        table.move(clipboard_history, row + 1, new, row)
-      end
-      clipboard_history[new] = value
-    end
-    self.selectorobj:refreshChoicesCallback()
+function obj:removeItem(row)
+  executeStatement(obj.dbDeleteItem, row.id)
+  self.selectorobj:refreshChoicesCallback()
 end
 
 -- Internal method:
-function obj:_showContextMenu(row)
-  print("_showContextMenu row:" .. row)
+function obj:_showContextMenu(index)
+  local row = menuData[index]
+  print("_showContextMenu row: " .. row.id)
   point = hs.mouse.getAbsolutePosition()
   local menu = hs.menubar.new(false)
   local menuTable = {
-       { title = "Alle Schnipsel mit Tab einfügen", fn = hs.fnutils.partial(self.pasteAllWithDelimiter, self, row, "\t") },
-       { title = "Alle Schnipsel mit Zeilenvorschub einfügen", fn = hs.fnutils.partial(self.pasteAllWithDelimiter, self, row, "\n") },
-       { title = "-" },
-       { title = "Eintrag entfernen",   fn = hs.fnutils.partial(self.manageClip, self, row, 0) },
-       { title = "Eintrag an erste Stelle",   fn = hs.fnutils.partial(self.manageClip, self, row, -100)  },
-       { title = "Eintrag nach oben",   fn = hs.fnutils.partial(self.manageClip, self, row, -1)  },
-       { title = "Eintrag nach unten",   fn = hs.fnutils.partial(self.manageClip, self, row, 1) },
-       { title = "Tabelle invertieren",   fn = hs.fnutils.partial(self.manageClip, self, row, 2) },
-       { title = "-" },
-       { title = "disabled item", disabled = true },
-       { title = "checked item", checked = true },
+       { title = "Remove entry",   fn = hs.fnutils.partial(self.removeItem, self, row) }
    }
   menu:setMenu(menuTable)
   menu:popupMenu(point)
   print(hs.inspect(point))
 end
 
+obj.colorPalette = {
+  light = {
+    text = { red = 1, green = 1, blue = 1, alpha = 1.0 }
+  },
+  dark = {
+    text = { red = 0.43, green = 0.43, blue = 0.43, alpha = 1.0 }
+  }
+}
+
+function obj:__sfSymbolToImage (symbol)
+  local char = hs.styledtext.new(symbol, {
+    font = { name = "SF Pro", size = 12},
+    color = obj.colorPalette.dark.text
+  })
+
+  local canvas = hs.canvas.new({ x = 0, y = 0, h = 0, w = 0 })
+  local size = canvas:minimumTextSize(char)
+  size.h = size.h + 6
+  size.w = size.w + 6
+  canvas:canvasDefaultFor("padding", 3)
+  canvas:size(size)
+  canvas[#canvas + 1] = {type = 'text', text = char}
+  local image = canvas:imageFromCanvas()
+  canvas:delete()
+  return image
+end
+
 -- Internal function - fill in the chooser options, including the control options
 function obj:_populateChooser()
-   menuData = {}
-   for k,v in pairs(clipboard_history) do
-      if (v.type == "text") then
-         table.insert(menuData, { text = v.content,
-                                  type = v.type})
-      elseif (v.type == "image") then
-         table.insert(menuData, { text = "《Image data》",
-                                  type = v.type,
-                                  data = v.content,
-                                  image = hs.image.imageFromURL(v.content)})
-      end
-   end
-   if #menuData == 0 then
-      table.insert(menuData, { text="",
-                               subText="《Clipboard is empty》",
-                               action = 'none',
-                               image = hs.image.imageFromName('NSCaution')})
-   else
-      table.insert(menuData, { text="《Clear Clipboard History》",
-                               action = 'clear',
-                               image = hs.image.imageFromName('NSTrashFull') })
-   end
-   table.insert(menuData, {
-                   text="《" .. (self.paste_on_select and "Disable" or "Enable") .. " Paste-on-select》",
-                   action = 'toggle_paste_on_select',
-                   image = (self.paste_on_select and hs.image.imageFromName('NSSwitchEnabledOn') or hs.image.imageFromName('NSSwitchEnabledOff'))
-   })
-   table.insert(menuData, {
-                   text="《" .. (self.max_size and "Disable" or "Enable") .. " max size " .. self.max_entry_size .. "》",
-                   action = 'toggle_max_size',
-                   image = (self.max_size and hs.image.imageFromName('NSSwitchEnabledOn') or hs.image.imageFromName('NSSwitchEnabledOff'))
-   })
-   self.logger.df("Returning menuData = %s", hs.inspect(menuData))
-   return menuData
+  menuData = {}
+  for k,v in pairs(executeStatement(obj.dbSelectItems)) do
+    if (v.type == 'text') then
+      table.insert(menuData, {
+        id = v.id,
+        type = v.type,
+        text = self:_firstLines(v.content),
+        data = v.content,
+        image = self:__sfSymbolToImage('􀅯') -- textformat.abc
+      })
+    elseif (v.type == "image") then
+      table.insert(menuData, {
+        id = v.id,
+        type = v.type,
+        text = "《 Image data 》",
+        data = v.content,
+        image = hs.image.imageFromURL(v.content)
+      })
+    end
+  end
+
+  if #menuData == 0 then
+    -- self.selectorobj:placeholderText('Clipboard is empty')
+    table.insert(menuData, {
+      text="Clipboard is empty",
+      action = 'none',
+      image = self:__sfSymbolToImage('􀟹') -- clipboard
+    })
+  else
+    table.insert(menuData, {
+      text="Clear Clipboard History",
+      action = 'clear',
+      image = self:__sfSymbolToImage('􀈑') -- trash
+    })
+  end
+
+  -- table.insert(menuData, {
+  --   text="《 " .. (self.paste_on_select and "Disable" or "Enable") .. " Paste-on-select 》",
+  --   action = 'toggle_paste_on_select',
+  --   image = (
+  --     self.paste_on_select and self:__sfSymbolToImage('􀇯') -- rays
+  --     or
+  --     self:__sfSymbolToImage('􀍱') -- wand.and.rays
+  --   )
+  -- })
+
+  self.logger.df("Returning menuData = %s", hs.inspect(menuData))
+  return menuData
 end
 
 --- ClipboardTool:shouldBeStored()
 --- Method
 --- Verify whether the pasteboard contents matches one of the values in `ClipboardTool.ignoredIdentifiers`
 function obj:shouldBeStored()
-   -- Code from https://github.com/asmagill/hammerspoon-config/blob/master/utils/_menus/newClipper.lua
-   local goAhead = true
-   for i,v in ipairs(hs.pasteboard.pasteboardTypes()) do
-      if self.ignoredIdentifiers[v] then
-         goAhead = false
-         break
-      end
-   end
-   if goAhead then
-      for i,v in ipairs(hs.pasteboard.contentTypes()) do
-         if self.ignoredIdentifiers[v] then
-            goAhead = false
-            break
-         end
-      end
-   end
-   return goAhead
+  -- Code from https://github.com/asmagill/hammerspoon-config/blob/master/utils/_menus/newClipper.lua
+  for i,v in ipairs(hs.pasteboard.pasteboardTypes()) do
+    if self.ignoredIdentifiers[v] then
+      return false
+    end
+  end
+
+  for i,v in ipairs(hs.pasteboard.contentTypes()) do
+    if self.ignoredIdentifiers[v] then
+      return false
+    end
+  end
+
+  return true
 end
 
--- Internal method:
-function obj:reduceSize(text)
-  print(#text .. " ? " .. tostring(max_entry_size))
-  local endingpos = 3000
-  local lastLowerPos = 3000
-  repeat
-    lastLowerPos = endingpos
-    _, endingpos = string.find(text, "\n\n", endingpos+1)
-    print("endingpos:" .. endingpos)
-  until endingpos > obj.max_entry_size
-  return string.sub(text, 1, lastLowerPos)
-end
+function obj:_firstLines (content)
+  local lines = {}
+  for line in content:gmatch("([^\n]*)\n?") do
+    lines[#lines + 1] = line
+    if #lines == 3 then break end
+  end
 
+  return table.concat(lines, "\n")
+end
 
 --- ClipboardTool:checkAndStorePasteboard()
 --- Method
@@ -368,26 +308,12 @@ function obj:checkAndStorePasteboard()
          self.logger.df("current_clipboard = %s", tostring(current_clipboard))
          if (current_clipboard == nil) and (pasteboard.readImage() ~= nil) then
             current_clipboard = pasteboard.readImage()
-            self:pasteboardToClipboard("image", current_clipboard:encodeAsURLString())
-            if self.show_copied_alert then
-                hs.alert.show("Copied image")
-            end
+            self:pasteboardToClipboard(now, "image", current_clipboard:encodeAsURLString())
             self.logger.df("Adding image (hashed) %s to clipboard history clipboard", hashfn(current_clipboard:encodeAsURLString()))
          elseif current_clipboard ~= nil then
            local size = #current_clipboard
-           if obj.max_size and size > obj.max_entry_size then
-             local answer = hs.dialog.blockAlert("Clipboard", "The maximum size of " .. obj.max_entry_size .. " was exceeded.", "Copy partially", "Copy all", "NSCriticalAlertStyle")
-              print("answer: " .. answer)
-              if answer == "Copy partially" then
-                current_clipboard = self:reduceSize(current_clipboard)
-                size = #current_clipboard
-                end
-            end
-            if self.show_copied_alert then
-                hs.alert.show("Copied " .. size .. " chars")
-            end
             self.logger.df("Adding %s to clipboard history", current_clipboard)
-            self:pasteboardToClipboard("text", current_clipboard)
+            self:pasteboardToClipboard(now, 'text', current_clipboard)
          else
             self.logger.df("Ignoring nil clipboard content")
          end
@@ -402,8 +328,15 @@ end
 --- Method
 --- Start the clipboard history collector
 function obj:start()
-   obj.logger.level = 0
-   clipboard_history = self:dedupe_and_resize(getSetting("items", {})) -- If no history is saved on the system, create an empty history
+   obj.db = hs.sqlite3.open('./clipboard.sqlite')
+   obj.db:exec("CREATE TABLE IF NOT EXISTS clipboard (id INTEGER PRIMARY KEY, timestamp INTEGER, hash TEXT, type TEXT, content TEXT);")
+   obj.db:exec("CREATE INDEX clipboard_idx_timestamp ON clipboard(timestamp);")
+   obj.db:exec("CREATE UNIQUE INDEX clipboard_idx_hash_unique ON clipboard(hash);")
+  --  obj.db:exec("CREATE VIRTUAL TABLE email USING fts5(sender, title, body);")
+   obj.dbInsertItem = obj.db:prepare("INSERT INTO clipboard (hash, timestamp, type, content) VALUES (?, ?, ?, ?) ON CONFLICT DO UPDATE SET timestamp = EXCLUDED.timestamp;")
+   obj.dbDeleteItem = obj.db:prepare("DELETE FROM clipboard WHERE id = ?;")
+   obj.dbSelectItems = obj.db:prepare("SELECT * FROM clipboard ORDER BY timestamp DESC LIMIT 100;")
+
    last_change = pasteboard.changeCount() -- keeps track of how many times the pasteboard owner has changed // Indicates a new copy has been made
    self.selectorobj = hs.chooser.new(hs.fnutils.partial(self._processSelectedItem, self))
    self.selectorobj:choices(hs.fnutils.partial(self._populateChooser, self))
@@ -422,24 +355,24 @@ end
 --- Method
 --- Display the current clipboard list in a chooser
 function obj:showClipboard()
-   if self.selectorobj ~= nil then
-      self.selectorobj:refreshChoicesCallback()
-      self.prevFocusedWindow = hs.window.focusedWindow()
-      self.selectorobj:show()
-   else
-      hs.notify.show("ClipboardTool not properly initialized", "Did you call ClipboardTool:start()?", "")
-   end
+  if self.selectorobj ~= nil then
+    self.selectorobj:refreshChoicesCallback()
+    self.prevFocusedWindow = hs.window.focusedWindow()
+    self.selectorobj:show()
+  else
+    hs.notify.show("ClipboardTool not properly initialized", "Did you call ClipboardTool:start()?", "")
+  end
 end
 
 --- ClipboardTool:toggleClipboard()
 --- Method
 --- Show/hide the clipboard list, depending on its current state
 function obj:toggleClipboard()
-   if self.selectorobj:isVisible() then
-      self.selectorobj:hide()
-   else
-      self:showClipboard()
-   end
+  if self.selectorobj:isVisible() then
+    self.selectorobj:hide()
+  else
+    self:showClipboard()
+  end
 end
 
 --- ClipboardTool:bindHotkeys(mapping)

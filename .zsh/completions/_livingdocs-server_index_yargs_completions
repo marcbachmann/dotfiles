@@ -1,0 +1,20 @@
+#compdef index.js
+###-begin-index.js-completions-###
+#
+# yargs command completion script
+#
+# Installation: ./bin/index.js completion >> ~/.zshrc
+#    or ./bin/index.js completion >> ~/.zprofile on OSX.
+#
+_index.js_yargs_completions()
+{
+  local reply
+  local si=$IFS
+  IFS=$'
+' reply=($(COMP_CWORD="$((CURRENT-1))" COMP_LINE="$BUFFER" COMP_POINT="$CURSOR" ./bin/index.js --get-yargs-completions "${words[@]}"))
+  IFS=$si
+  _describe 'values' reply
+}
+compdef _index.js_yargs_completions index.js
+###-end-index.js-completions-###
+
