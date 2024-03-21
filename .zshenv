@@ -66,7 +66,7 @@ darkmode () {
   #  echo -ne "\033]50;SetProfile=Light\a"
   #fi
 
-  echo "setDarkMode($1)" | /usr/local/bin/hs
+  echo "setDarkMode($1)" | /opt/homebrew/bin/hs
 }
 
 alias dark='darkmode true'
