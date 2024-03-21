@@ -1,0 +1,32 @@
+[directory]
+truncation_length = 4
+truncation_symbol = "…/"
+truncate_to_repo = false
+
+[directory.substitutions]
+"~/Development/livingdocsIO" = "~li"
+"~/Development/marcbachmann" = "~mb"
+"~/Development/nzz" = "~nzz"
+"~/Development/sueddeutsche" = "~sz"
+"~/Development" = "~d"
+
+[package]
+disabled = true
+
+[nodejs]
+disabled = true
+
+[git_branch]
+format = "[$symbol$branch]($style) "
+
+[docker_context]
+disabled = true
+
+[env_var.ENVIRONMENT]
+format = "[ENVIRONMENT=$env_value](red) "
+
+[env_var.ENV]
+format = "[ENV=$env_value](cyan) "
+
+[kubernetes]
+# disabled = false
