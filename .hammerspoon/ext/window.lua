@@ -1,5 +1,5 @@
 local module = {}
-local spaces = require("hs._asm.undocumented.spaces")
+-- local spaces = require("hs._asm.undocumented.spaces")
 
 local function firstElement(tbl)
   for i=1, #tbl, 1 do
@@ -43,14 +43,14 @@ module.getNextSpace = function(direction)
   local currentSpace = firstElement(win:spaces())
   if currentSpace == nil then return end
 
-  return nextElement(spaces.layout()[screenUUID], currentSpace, offset)
+  return nextElement(hs.spaces.layout()[screenUUID], currentSpace, offset)
 end
 
 module.moveToNextSpace = function(direction)
   local win = hs.window.focusedWindow()
   local nextSpace = module.getNextSpace(direction)
   if nextSpace == nil then return flashScreen() end
-  spaces.moveWindowToSpace(win:id(), nextSpace)
+  hs.spaces.moveWindowToSpace(win:id(), nextSpace)
   module.goToNextSpace(direction)
 end
 

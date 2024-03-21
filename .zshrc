@@ -38,7 +38,7 @@ if [ $TERM_PROGRAM = "iTerm.app" ] || [ $TERM_PROGRAM = "Hyper" ] || [ $TERM_PRO
   DISABLE_AUTO_UPDATE="true"
   COMPLETION_WAITING_DOTS="true"
   ZSH_DISABLE_COMPFIX=true
-  source /usr/local/share/antigen/antigen.zsh
+  source /opt/homebrew/share/antigen/antigen.zsh
   antigen init ~/.antigenrc
   eval "$(starship init zsh)"
 fi
