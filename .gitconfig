@@ -22,6 +22,7 @@
   twohead = ort
 
 [alias]
+  stashgrep = "!f() { for i in `git stash list --format=\"%gd\"` ; do git stash show -p $i | grep -H --label=\"$i\" \"$@\" ; done ; }; f"
   authors = log --format='%aN <%aE>'
   lg = log --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --date=relative
   last = log -n1 --decorate=short --abbrev-commit --format=fuller
@@ -43,6 +44,7 @@
   checkout-pr = "!f() { git fetch origin refs/pull/$1/head:pr/$1; } ; f"
   branch-delete = !$HOME/.dotfiles/branch-delete.sh
   branch-cleanup = !$HOME/.dotfiles/branch-cleanup.sh
+  branch-history-cleanup = !$HOME/.dotfiles/branch-cleanup-select.mjs
   branchd = !$HOME/.dotfiles/branch-delete.sh
   diff-list = diff --name-only
   repo = !hub browse
