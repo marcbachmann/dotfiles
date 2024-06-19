@@ -3,7 +3,7 @@ DEFAULT_BRANCH=master
 if [ -n "$(git branch --list main)" ]; then DEFAULT_BRANCH=main; fi
 
 BASE_BRANCH=$DEFAULT_BRANCH
-PREFERRED_BASE_BRANCH="$(jq -r '.release.branch // .release.branches[0] // ""' package.json 2> /dev/null)"
+PREFERRED_BASE_BRANCH="$(jq -r '.release.branch // .release.branches[0].name // .release.branches[0] // ""' package.json 2> /dev/null)"
 if [[ "$PREFERRED_BASE_BRANCH" != "" ]]; then BASE_BRANCH="$PREFERRED_BASE_BRANCH"; fi
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
@@ -12,9 +12,9 @@ BODY=""
 if [[ "$BRANCH" == "backport/"* ]]; then
   PRID=$(sed 's:backport/\([0-9]\+\)/.*:\1:' <<< "$BRANCH")
   REPOURL=$(gh repo view --jq '.url' --json url)
-  PRDATA=$(gh pr view $REPOURL/pull/$PRID)
-  BODY=$(echo -e "$PRDATA" | sed -e '1,/--/d')
-  TITLE=$(sed -n -e '1 s/title:\s\(.*\)/\1/p' <<< "$PRDATA")
+  PRDATA=$(gh pr view $REPOURL/pull/$PRID --json title,body)
+  BODY=$(jq -r .body <<< "$PRDATA")
+  TITLE=$(jq -r .title <<< "$PRDATA")
   if [ "$BASE_BRANCH" != "master" ]; then TITLE="$TITLE [$BASE_BRANCH]"; fi
 fi
 
@@ -24,4 +24,4 @@ if [ "$BODY" == "" ]; then
 fi
 
 if [ "$TITLE" == "" ]; then TITLE=$(git log -1 --oneline --format=%s | sed 's/^.*: //'); fi
-gh pr create --draft --base $BASE_BRANCH -b "$BODY" --head $BRANCH --title "$TITLE"
+gh pr create --draft --base "$BASE_BRANCH" -b "$BODY" --head "$BRANCH" --title "$TITLE"
