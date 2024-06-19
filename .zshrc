@@ -1,5 +1,5 @@
 # export DISABLE_MAGIC_FUNCTIONS=true
-PATH=/usr/local/opt/curl/bin:/usr/local/opt/gnu-sed/libexec/gnubin:$PATH:/usr/local/bin:$HOME/bin
+PATH=/usr/local/opt/curl/bin:/opt/homebrew/opt/gnu-sed/libexec/gnubin:$PATH:/usr/local/bin:$HOME/bin
 export DEFAULT_USER="marcbachmann"
 setopt histignorespace
 export EDITOR='nano'

@@ -46,6 +46,7 @@ DARKMODE=$(cat "$HOME/.darkmode")
 
 # Kubernetes
 PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
+export AWS_VAULT_KEYCHAIN_NAME=login
 export AWS_VAULT_PROMPT=osascript
 
 # Yarn
@@ -54,10 +55,10 @@ export AWS_VAULT_PROMPT=osascript
 # General aliases
 alias top=htop
 alias ll='ls -alF'
-alias psql=/usr/local/opt/libpq/bin/psql
 export PGHOST=localhost
 export PGUSER=postgres
 export PGPASSFILE=$HOME/.pgpass
+PATH="/opt/homebrew/bin:/opt/homebrew/opt/libpq/bin:$PATH"
 
 darkmode () {
   #if [ "$1" = "true" ]; then
@@ -242,7 +243,7 @@ popline () {
   sed -i '' -e '$ d' $1
 }
 
-function drone () { DRONE_SERVER=https://drone.livingdocs.io /usr/local/bin/drone --autoscaler https://ci-autoscaler.livingdocs.io $@ }
+function drone () { DRONE_SERVER=https://drone.livingdocs.io /opt/homebrew/bin/drone --autoscaler https://ci-autoscaler.livingdocs.io $@ }
 
 function ensure-global-module {
   /usr/bin/which "${2:-$1}" &> /dev/null || npm install -g $1

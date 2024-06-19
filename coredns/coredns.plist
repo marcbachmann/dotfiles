@@ -6,9 +6,9 @@
     <string>local.marcbachmann.coredns</string>
     <key>ProgramArguments</key>
     <array>
-      <string>/bin/zsh</string>
-      <string>-c</string>
-      <string>/Users/marcbachmann/.dotfiles/coredns/coredns -conf /Users/marcbachmann/.dotfiles/coredns/Corefile</string>
+      <string>/opt/homebrew/bin/coredns</string>
+      <string>-conf</string>
+      <string>/Users/marcbachmann/.dotfiles/coredns/Corefile</string>
     </array>
     <key>RunAtLoad</key>
     <true/>
