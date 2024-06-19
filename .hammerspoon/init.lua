@@ -1,5 +1,7 @@
 local drawing = require('ext.drawing')
 local window = require('ext.window')
+local spaces = require('hs.spaces')
+
 local ipc = require("hs.ipc")
 local os = require("ext.os")
 local utils = require("ext.utils")
@@ -97,6 +99,60 @@ local function config()
     return diff and diff < 500000000
   end
 
+
+  function getGoodFocusedWindow(nofull)
+     local win = hs.window.focusedWindow()
+     if not win or not win:isStandard() then return end
+     if nofull and win:isFullScreen() then return end
+     return win
+  end
+
+  function switchSpace(skip,dir)
+     for i=1,skip do
+        hs.eventtap.keyStroke({"ctrl","fn"},dir,0) -- "fn" is a bugfix!
+     end
+  end
+
+  function moveWindowOneSpace (dir, switch)
+    local win = getGoodFocusedWindow(true)
+    if not win then return end
+
+    local screen = win:screen()
+    local uuid = screen:getUUID()
+    local userSpaces = nil
+    for k,v in pairs(spaces.allSpaces()) do
+       userSpaces = v
+       if k == uuid then break end
+    end
+    if not userSpaces then return end
+
+    local thisSpace = spaces.windowSpaces(win) -- first space win appears on
+    if not thisSpace then return else thisSpace = thisSpace[1] end
+    local last = nil
+    local skipSpaces = 0
+
+    for _, spc in ipairs(userSpaces) do
+      -- skippable space
+      if spaces.spaceType(spc) ~= "user" then
+        skipSpaces = skipSpaces + 1
+      else
+        if last and ((dir == "left" and spc == thisSpace) or (dir == "right" and last == thisSpace)) then
+          local newSpace = (dir == "left" and last or spc)
+          if switch then switchSpace(skipSpaces + 1, dir) end
+          spaces.moveWindowToSpace(win, newSpace)
+          return
+        end
+        -- Haven't found it yet...
+        last = spc
+        skipSpaces = 0
+      end
+    end
+
+    -- No space found
+    hs.osascript.applescript("beep")
+  end
+
+
   hs.hotkey.bind(ctrl_alt_cmd, "up", function()
     local diff = withinTime()
     if diff and lastop == 'fullscreen' then
@@ -172,11 +228,11 @@ local function config()
   end)
 
   hs.hotkey.bind(ctrl_cmd, 'left', function()
-    window.moveToNextSpace('left')
+    moveWindowOneSpace('left', true)
   end)
 
   hs.hotkey.bind(ctrl_cmd, 'right', function()
-    window.moveToNextSpace('right')
+    moveWindowOneSpace('right', true)
   end)
 
   hs.hotkey.bind(ctrl_alt_cmd, 'left', function()
@@ -231,32 +287,7 @@ local function config()
   hs.batteryWatcher = hs.battery.watcher.new(watchBattery)
   hs.batteryWatcher:start()
 
-  -- local menu_bar = hs.menubar.new()
-  -- local network = hs.network.configuration.open()
-  -- menu_bar:setTitle(network:hostname())
-  -- hs.timer.doAt("0:00","1m", function()
-  --   menu_bar:setTitle(network:hostname())
-  -- end)
-
-
-  -- Fix an annoying behavior in osx where apps that
-  -- don't have a window open, aren't focused when
-  -- opening the app using the application switcher (cmd+tab)
-  local appsToFix = {}
-  appsToFix["com.tinyspeck.slackmacgap"] = true
-  appsToFix["desktop.WhatsApp"] = true
-  appsToFix["com.sonos.macController2"] = true
-  appsToFix["com.googlecode.iterm2"] = true
-  hs.myAppWatcher = hs.application.watcher.new(function(name, type, app)
-    if  type == hs.application.watcher.activated then
-      local bundleId = app:bundleID()
-      print(bundleId)
-      if app:focusedWindow() == nil and appsToFix[bundleId] == true then
-        hs.application.open(bundleId)
       end
-    end
-  end)
-  hs.myAppWatcher:start()
 
   function clear() hs.console.clearConsole() end
 
